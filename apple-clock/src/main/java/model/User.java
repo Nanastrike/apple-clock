@@ -1,4 +1,5 @@
 package model;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,26 +8,23 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
-@Table(name = "work_type")
+@Table(name = "user_info")
 @Getter
 @Setter
 @NoArgsConstructor
-public class WorkType {
+public class User {
+    @OneToMany(mappedBy = "user")
+    private List<WorkType> workTypes;
+
     @OneToMany(mappedBy = "workType")
     private List<WorkLogs> workLogs;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private  String color;//color number
+    private String userName;
 
-    public WorkType(String color, String name) {
-        this.color = color;
-        this.name = name;
+    public User(String userName) {
+        this.userName = userName;
     }
 }
