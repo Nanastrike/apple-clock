@@ -17,6 +17,11 @@ public class AppleClockApplication extends Application {
 
         // 配置主舞台
         primaryStage.setTitle("Apple Clock");
+        primaryStage.setWidth(800);    // 宽度 800px
+        primaryStage.setHeight(600);   // 高度 600px
+        primaryStage.setMinWidth(600);//最小尺寸
+        primaryStage.setMinHeight(400);//最小尺寸
+
         primaryStage.setScene(scene);
         primaryStage.show();
     }
