@@ -1,42 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.BorderPane?>
 
-<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="controller.MainViewController"
-            style="-fx-background-color: #fef9f3;">
+<!--
+  主界面布局
+  - 顶部是标题
+  - 中间是苹果图片 + 时间
+  - 底部是操作按钮
+-->
 
-    <!-- 顶部标题栏 -->
-    <top>
-        <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 10;">
-            <Label text="Apple Clock" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
-            <Region fx:id="spacer" HBox.hgrow="ALWAYS"/>
-            <Button text="⚙" fx:id="settingButton"/>
-            <Button text="📊" fx:id="statButton"/>
-        </HBox>
-    </top>
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controller.MainController">
 
-    <!-- 中间苹果图 + 时间 -->
+    <!-- 中间主体 -->
     <center>
         <VBox spacing="10" alignment="CENTER">
-            <ImageView fx:id="appleView" fitWidth="200" preserveRatio="true"
-                       image="@/images/apple_red.png" />
-            <Label fx:id="timerLabel" text="25:00" style="-fx-font-size: 36px; -fx-font-weight: bold;"/>
+            <ImageView fx:id="appleImage" fitWidth="200" fitHeight="200" />
+            <Label fx:id="timerLabel" text="30:00" style="-fx-font-size: 30px; -fx-text-fill: #333;" />
         </VBox>
     </center>
 
-    <!-- 事件名称 -->
+    <!-- 底部按钮区 -->
     <bottom>
-        <VBox spacing="10" alignment="CENTER" style="-fx-padding: 20;">
-            <Label fx:id="eventLabel" text="# Event" style="-fx-font-size: 18px;"/>
-            <HBox spacing="20" alignment="CENTER">
-                <Button fx:id="pauseButton" text="Pause" prefWidth="100"/>
-                <Button fx:id="stopButton" text="Stop" prefWidth="100"/>
-            </HBox>
-        </VBox>
+        <HBox spacing="15" alignment="CENTER" style="-fx-padding: 20px;">
+            <Button fx:id="startButton" text="开始" onAction="#handleStart"/>
+            <Button fx:id="pauseButton" text="暂停" onAction="#handlePause" disable="true"/>
+            <Button fx:id="stopButton" text="停止" onAction="#handleStop" disable="true"/>
+        </HBox>
     </bottom>
 
 </BorderPane>
