@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:sqlite:data/apple-clock.db
+    driver-class-name: org.sqlite.JDBC
+  jpa:
+    database-platform: model.config.MySQLiteDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true

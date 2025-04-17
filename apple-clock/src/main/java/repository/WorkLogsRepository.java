@@ -8,4 +8,5 @@ import java.util.List;
 public interface WorkLogsRepository extends JpaRepository<WorkLogs, Long> {
     List<WorkLogs> findByUserId(Long userId);
 
+    List<WorkLogs> findTop3ByUserIdOrderByBeginDesc(Long userId);
 }

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controller.MainViewController"
+            style="-fx-background-color: #fef9f3;">
+
+    <!-- 顶部标题栏 -->
+    <top>
+        <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 10;">
+            <Label text="Apple Clock" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+            <Region fx:id="spacer" HBox.hgrow="ALWAYS"/>
+            <Button text="⚙" fx:id="settingButton"/>
+            <Button text="📊" fx:id="statButton"/>
+        </HBox>
+    </top>
+
+    <!-- 中间苹果图 + 时间 -->
+    <center>
+        <VBox spacing="10" alignment="CENTER">
+            <ImageView fx:id="appleView" fitWidth="200" preserveRatio="true"
+                       image="@/images/apple_red.png" />
+            <Label fx:id="timerLabel" text="25:00" style="-fx-font-size: 36px; -fx-font-weight: bold;"/>
+        </VBox>
+    </center>
+
+    <!-- 事件名称 -->
+    <bottom>
+        <VBox spacing="10" alignment="CENTER" style="-fx-padding: 20;">
+            <Label fx:id="eventLabel" text="# Event" style="-fx-font-size: 18px;"/>
+            <HBox spacing="20" alignment="CENTER">
+                <Button fx:id="pauseButton" text="Pause" prefWidth="100"/>
+                <Button fx:id="stopButton" text="Stop" prefWidth="100"/>
+            </HBox>
+        </VBox>
+    </bottom>
+
+</BorderPane>
