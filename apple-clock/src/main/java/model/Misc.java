@@ -16,5 +16,14 @@ public class Misc {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Integer themeStyle = (Integer) 0;    // 0=红苹果, 1=绿苹果
+    // 默认主题风格：0 = 红苹果，1 = 绿苹果
+    @Column(nullable = false)
+    private Integer themeStyle = 0;
+
+    // 默认语言：0 = English，1 = Mandarin
+    @Column(nullable = false)
+    private Integer language = 0;
+
+    @Column(nullable = false)
+    private String username = "User"; // 默认用户名，初始叫 User
 }

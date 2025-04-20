@@ -3,9 +3,6 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 import repository.WorkTypeRepository;
 import repository.WorkTypeRepositoryImpl;
 import service.WorkTypeService;
@@ -14,16 +11,8 @@ import service.WorkTypeService;
  * 主程序入口类，继承自 JavaFX 的 Application。
  * 负责加载 FXML 界面文件，并展示主窗口。
  */
-@SpringBootApplication
 public class AppleClockApplication extends Application {
 
-    private ConfigurableApplicationContext ctx;
-
-    @Override
-    public void init() {
-        // 启动 Spring Boot
-        ctx = SpringApplication.run(AppleClockApplication.class);
-    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -47,10 +36,6 @@ public class AppleClockApplication extends Application {
         primaryStage.show();
     }
 
-    @Override
-    public void stop() {
-        ctx.close();
-    }
 
     public static void main(String[] args) {
         launch(args); // 启动 JavaFX 应用

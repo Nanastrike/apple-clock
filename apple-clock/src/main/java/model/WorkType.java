@@ -1,9 +1,9 @@
 package model;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.util.List;
 
 @Entity
@@ -12,18 +12,16 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class WorkType {
-    @OneToMany(mappedBy = "workType")
-    private List<WorkLogs> workLogs;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
-    private  String color;//color number
+    private String color; // 颜色代码
+
+    @OneToMany(mappedBy = "workType", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WorkLogs> workLogs;
 
     public WorkType(String color, String name) {
         this.color = color;

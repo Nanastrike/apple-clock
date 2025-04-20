@@ -18,9 +18,8 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.ComboBox?>
-<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="controller.MainController">
-    <!-- 右上角的按钮-->
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainController">
+    <!-- 顶部 -->
     <top>
         <BorderPane>
             <right>
@@ -32,34 +31,31 @@
         </BorderPane>
     </top>
 
-    <!--苹果钟+事件名两个组件的合集容器，x和y设置两个容器的位置-->
-    <VBox fx:id="appleAndEventGroup" layoutX="150" layoutY="100" spacing="10" alignment="CENTER">
-        <!-- 时钟部分 -->
-        <StackPane fx:id="appleStack" alignment="CENTER">
-                <ImageView fx:id="appleImage" fitWidth="200" fitHeight="200" onMouseClicked="#onAppleClick"/>
-                <Label fx:id="timerLabel" text="30:00"
-                       style="-fx-font-size: 30px; -fx-text-fill: #333;"
-                       translateY="-60"/>
+    <!-- 中间（苹果钟+选择时间面板叠加） -->
+    <center>
+        <StackPane>
+            <!-- 苹果钟部分 -->
+            <VBox fx:id="appleAndEventGroup" layoutX="150" layoutY="100" spacing="10" alignment="CENTER">
+                <StackPane fx:id="appleStack" alignment="CENTER">
+                    <ImageView fx:id="appleImage" fitWidth="200" fitHeight="200" onMouseClicked="#onAppleClick"/>
+                    <Label fx:id="timerLabel" text="30:00" style="-fx-font-size: 30px; -fx-text-fill: #333;" translateY="-60"/>
+                </StackPane>
+                <VBox fx:id="eventSelector" spacing="5" alignment="CENTER">
+                    <Label fx:id="eventLabel" text="当前事件" style="-fx-font-size: 18px;"/>
+                    <ComboBox fx:id="workTypeComboBox" prefWidth="150"/>
+                </VBox>
+            </VBox>
+
+            <!-- 选择时间面板 -->
+            <AnchorPane fx:id="timePickerPanel" visible="false" style="-fx-background-color: rgba(0,0,0,0.5)">
+                <VBox alignment="CENTER" spacing="10" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                    <Label text="Choose" style="-fx-text-fill: white; -fx-font-size: 18px;"/>
+                    <Spinner fx:id="minuteSpinner" prefWidth="100"/>
+                    <Button text="Confirm" onAction="#handleConfirmTime"/>
+                </VBox>
+            </AnchorPane>
         </StackPane>
-
-        <!--跟在时钟下的事件名-->
-        <VBox fx:id="eventSelector" spacing="5" alignment="CENTER">
-            <Label fx:id="eventLabel" text="当前事件" style="-fx-font-size: 18px;"/>
-            <ComboBox fx:id="workTypeComboBox" prefWidth="150"/>
-        </VBox>
-    </VBox>
-
-    <!--点击苹果后出现选择时间的panel-->
-    <AnchorPane fx:id="timePickerPanel" visible="false" style="-fx-background-color: rgba(0,0,0,0.5)">
-        <VBox alignment="CENTER" spacing="10">
-            <Label text="Choose" style="-fx-text-fill: white; -fx-font-size: 18px;"/>
-            <Spinner fx:id="minuteSpinner" prefWidth="100" />
-            <Button text="Confirm" onAction="#handleConfirmTime"/>
-        </VBox>
-    </AnchorPane>
-
-    <!--事件名的位置，并读取数据库-->
-
+    </center>
 
     <!-- 底部按钮区 -->
     <bottom>

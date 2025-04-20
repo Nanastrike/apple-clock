@@ -1,7 +1,11 @@
 package repository;
 
 import model.Misc;
-import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface MiscRepository extends JpaRepository<Misc, Long> {
+import java.util.List;
+
+public interface MiscRepository  {
+    Misc save(Misc misc);
+    List<Misc> findAll();
+    Misc findById(long id);
 }

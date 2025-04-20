@@ -12,8 +12,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Duration;
+import model.WorkLogs;
 import model.WorkType;
-import org.springframework.stereotype.Component;
+
+import service.WorkLogsService;
 import service.WorkTypeService;
 
 import java.io.InputStream;
@@ -25,7 +27,7 @@ import java.util.ResourceBundle;
 /**
  * 控制器类，处理界面元素交互逻辑。
  */
-@Component
+
 public class MainController implements Initializable {
 
     // -------------- 绑定 FXML --------------
@@ -43,22 +45,24 @@ public class MainController implements Initializable {
     private boolean isPaused = false;
 
     private WorkTypeService workTypeService;
+    private WorkLogsService workLogsService;
+    private WorkLogs currentLog; // 当前正在进行的计时
 
-    // Spring Boot 注入 WorkTypeService 后再初始化界面
+    // 提供给外部设置 Service
     public void setWorkTypeService(WorkTypeService service) {
         this.workTypeService = service;
     }
+
+    public void setWorkLogsService(WorkLogsService service) {
+        this.workLogsService = service;
+    }
+
 
     /**
      * 初始化方法，在界面加载后自动调用。
      */
     @FXML
-    public void initialize(URL location, ResourceBundle resources) {}
-
-    /** 界面控件和 Service 都准备好后，正式初始化界面 */
-    public void afterInject() {
-        // 初始化默认事件
-        workTypeService.initializeDefaultWorkTypes();
+    public void initialize(URL location, ResourceBundle resources) {
 
         // 初始化默认事件类型
         workTypeService.initializeDefaultWorkTypes();
@@ -91,15 +95,29 @@ public class MainController implements Initializable {
     /**
      * 点击开始按钮时触发。
      */
+
     @FXML
     public void handleStart() {
         if (timeline == null || isPaused) {
             startTimer();
+            // 调用后端开始记录
+            String selectedTypeName = workTypeComboBox.getSelectionModel().getSelectedItem();
+            if (selectedTypeName != null) {
+                WorkType selectedType = workTypeService.findByName(selectedTypeName);
+                if (selectedType != null) {
+                    currentLog = workLogsService.startLog(selectedType.getId());
+                } else {
+                    System.out.println("找不到对应的事件类型！");
+                }
+            } else {
+                System.out.println("请选择一个事件类型！");
+            }
         }
         startButton.setDisable(true);
         pauseButton.setDisable(false);
         stopButton.setDisable(false);
     }
+
 
     /**
      * 点击暂停按钮时触发。
@@ -122,9 +140,15 @@ public class MainController implements Initializable {
             timeline.stop();
             timeline = null;
         }
-        remainingSeconds = 30 * 60; // 重置倒计时
+        remainingSeconds = 30 * 60;
         isPaused = false;
         updateTimerLabel();
+
+        // ⭐调用后端停止记录
+        if (currentLog != null) {
+            workLogsService.stopLog(currentLog.getId());
+            currentLog = null;
+        }
 
         startButton.setDisable(false);
         pauseButton.setDisable(true);
