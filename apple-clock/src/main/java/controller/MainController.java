@@ -13,7 +13,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Duration;
 import model.WorkType;
-import repository.WorkTypeRepository;
+import org.springframework.stereotype.Component;
 import service.WorkTypeService;
 
 import java.io.InputStream;
@@ -25,67 +25,67 @@ import java.util.ResourceBundle;
 /**
  * 控制器类，处理界面元素交互逻辑。
  */
+@Component
 public class MainController implements Initializable {
 
-    @FXML
-    private ImageView appleImage;
+    // -------------- 绑定 FXML --------------
+    @FXML private ImageView appleImage;
+    @FXML private Label timerLabel;
+    @FXML private Button startButton, pauseButton, stopButton;
+    @FXML private ComboBox<String> workTypeComboBox;
+    @FXML private AnchorPane timePickerPanel;
+    @FXML private Spinner<Integer> minuteSpinner;
+    @FXML private Button settingButton, staticsButton;
 
-    @FXML
-    private Label timerLabel;
-
-    @FXML
-    private Button startButton;
-
-    @FXML
-    private Button pauseButton;
-
-    @FXML
-    private Button stopButton;
-
-    @FXML
-    private AnchorPane timePickerPanel;
-
-    @FXML
-    private Spinner<Integer> minuteSpinner;
-
-    @FXML
-    private ComboBox<String> workTypeComboBox;
-
-    private Timeline timeline; // JavaFX自带定时器
-    private int remainingSeconds = 30 * 60; // 默认30分钟（单位：秒）
+    // -------------- 内部变量 --------------
+    private Timeline timeline;
+    private int remainingSeconds = 30 * 60;
     private boolean isPaused = false;
 
     private WorkTypeService workTypeService;
 
-    public void setWorkTypeService(WorkTypeService workTypeService) {
-        this.workTypeService = workTypeService;
+    // Spring Boot 注入 WorkTypeService 后再初始化界面
+    public void setWorkTypeService(WorkTypeService service) {
+        this.workTypeService = service;
     }
 
     /**
      * 初始化方法，在界面加载后自动调用。
      */
     @FXML
-    public void initialize(URL location, ResourceBundle resources) {
+    public void initialize(URL location, ResourceBundle resources) {}
+
+    /** 界面控件和 Service 都准备好后，正式初始化界面 */
+    public void afterInject() {
         // 初始化默认事件
         workTypeService.initializeDefaultWorkTypes();
-        // 加载红苹果图片作为默认表盘
-        InputStream imageStream = getClass().getResourceAsStream("/images/apple_red.png");
-        if (imageStream != null) {
-            appleImage.setImage(new Image(imageStream));
-        } else {
-            System.out.println("苹果图片找不到！");
-        }
-        updateTimerLabel();
-        // 加载事件到下拉框
-        List<WorkType> workTypes = workTypeService.getAllTypes();
-        for (WorkType wt : workTypes) {
+
+        // 初始化默认事件类型
+        workTypeService.initializeDefaultWorkTypes();
+        List<WorkType> types = workTypeService.getAllTypes();
+        for (WorkType wt : types) {
             workTypeComboBox.getItems().add(wt.getName());
         }
-
-        // 默认选中第一个（如果有的话）
         if (!workTypeComboBox.getItems().isEmpty()) {
-            workTypeComboBox.getSelectionModel().select(0);
+            workTypeComboBox.getSelectionModel().selectFirst();
         }
+
+        // 加载红苹果图片作为默认表盘
+        InputStream imageStream = getClass().getResourceAsStream("/images/apple_red.png");
+        ImageView settingsIcon = new ImageView(new Image(getClass().getResourceAsStream("/images/settings.png")));
+        settingsIcon.setFitWidth(24);
+        settingsIcon.setFitHeight(24);
+        settingButton.setGraphic(settingsIcon);
+
+        // 给staticsButton加图标和文字
+        ImageView staticsIcon = new ImageView(new Image(getClass().getResourceAsStream("/images/statics.png")));
+        staticsIcon.setFitWidth(24);
+        staticsIcon.setFitHeight(24);
+        staticsButton.setGraphic(staticsIcon);
+
+        // 初始化倒计时显示
+        updateTimerLabel();
+
     }
 
     /**

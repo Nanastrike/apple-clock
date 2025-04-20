@@ -64,9 +64,9 @@
     <!-- 底部按钮区 -->
     <bottom>
         <HBox spacing="15" alignment="CENTER" style="-fx-padding: 20px;">
-            <Button fx:id="startButton" text="开始" onAction="#handleStart"/>
-            <Button fx:id="pauseButton" text="暂停" onAction="#handlePause" disable="true"/>
-            <Button fx:id="stopButton" text="停止" onAction="#handleStop" disable="true"/>
+            <Button fx:id="startButton" text="Start" onAction="#handleStart"/>
+            <Button fx:id="pauseButton" text="Pause" onAction="#handlePause" disable="true"/>
+            <Button fx:id="stopButton" text="Stop" onAction="#handleStop" disable="true"/>
         </HBox>
     </bottom>
 

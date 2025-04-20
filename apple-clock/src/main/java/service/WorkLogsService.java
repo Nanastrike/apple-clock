@@ -33,7 +33,7 @@ public class WorkLogsService {
             System.out.println("the user doesn't exist");
             return null;
         }
-        WorkType workType = workTypeRepository.findById(workTypeId).orElse(null);
+        WorkType workType = workTypeRepository.findById(workTypeId);
         if (workType == null) {
             System.out.println("this type doesn't exist");
             return null;

@@ -60,7 +60,7 @@ public WorkType update(WorkType workType){
      * 检查数据库，如果没有事件类型，初始化默认的三条数据
      */
     public void initializeDefaultWorkTypes() {
-        if (workTypeRepository.count() == 0) {
+        if (workTypeRepository.findAll().isEmpty()){
             WorkType learn = new WorkType("学习", "#A3BFD9");   // 莫兰迪蓝
             WorkType draw = new WorkType("运动", "#C1A3BF");    // 莫兰迪紫
             WorkType read = new WorkType("看书", "#A3C1A3");    // 莫兰迪绿
