@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<hibernate-configuration>
+    <session-factory>
+
+        <!-- 数据库连接配置 -->
+        <property name="hibernate.connection.driver_class">org.h2.Driver</property>
+        <property name="hibernate.connection.url">jdbc:h2:mem:appleclockdb;DB_CLOSE_DELAY=-1</property>
+        <property name="hibernate.connection.username">sa</property>
+        <property name="hibernate.connection.password"></property>
+
+        <!-- 方言 -->
+        <property name="hibernate.dialect">org.hibernate.dialect.H2Dialect</property>
+
+        <!-- 是否显示SQL语句 -->
+        <property name="hibernate.show_sql">true</property>
+
+        <!-- 自动建表选项 -->
+        <property name="hibernate.hbm2ddl.auto">update</property>
+
+        <!-- 实体类映射 -->
+        <mapping class="model.Misc"/>
+        <mapping class="model.WorkLogs"/>
+        <mapping class="model.WorkType"/>
+
+    </session-factory>
+</hibernate-configuration>

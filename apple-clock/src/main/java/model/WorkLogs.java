@@ -22,6 +22,7 @@ public class WorkLogs {
     private WorkType workType;
 
     private LocalDateTime begin;
+    @Column(name = "end_time")
     private LocalDateTime end;
     private int duration;
 

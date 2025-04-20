@@ -61,35 +61,68 @@ public class MainController implements Initializable {
     /**
      * 初始化方法，在界面加载后自动调用。
      */
-    @FXML
-    public void initialize(URL location, ResourceBundle resources) {
 
-        // 初始化默认事件类型
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        setupUI();
+    }
+
+    private void setupUI() {
+        try {
+            InputStream appleStream = MainController.class.getResourceAsStream("/images/apple_red.png");
+            if (appleStream != null) {
+                appleImage.setImage(new Image(appleStream));
+            } else {
+                System.out.println("警告：apple_red.png 未找到！");
+            }
+
+            InputStream settingsStream = MainController.class.getResourceAsStream("/images/settings.png");
+            if (settingsStream != null) {
+                ImageView settingsIcon = new ImageView(new Image(settingsStream));
+                settingsIcon.setFitWidth(24);
+                settingsIcon.setFitHeight(24);
+                settingButton.setGraphic(settingsIcon);
+            } else {
+                System.out.println("警告：settings.png 未找到！");
+            }
+
+            InputStream staticsStream = MainController.class.getResourceAsStream("/images/clocker.png");
+            if (staticsStream != null) {
+                ImageView staticsIcon = new ImageView(new Image(staticsStream));
+                staticsIcon.setFitWidth(24);
+                staticsIcon.setFitHeight(24);
+                staticsButton.setGraphic(staticsIcon);
+            } else {
+                System.out.println("警告：statics.png 未找到！");
+            }
+
+        } catch (Exception e) {
+            System.out.println("加载图片时出错：" + e.getMessage());
+            e.printStackTrace();
+        }
+
+        // 初始化倒计时显示
+        updateTimerLabel();
+    }
+
+
+    // -------------- 外部手动调用，加载后端数据 --------------
+    public void initData() {
+        if (workTypeService == null) {
+            System.out.println("WorkTypeService未注入，无法初始化！");
+            return;
+        }
+
         workTypeService.initializeDefaultWorkTypes();
+
         List<WorkType> types = workTypeService.getAllTypes();
+        workTypeComboBox.getItems().clear();
         for (WorkType wt : types) {
             workTypeComboBox.getItems().add(wt.getName());
         }
         if (!workTypeComboBox.getItems().isEmpty()) {
             workTypeComboBox.getSelectionModel().selectFirst();
         }
-
-        // 加载红苹果图片作为默认表盘
-        InputStream imageStream = getClass().getResourceAsStream("/images/apple_red.png");
-        ImageView settingsIcon = new ImageView(new Image(getClass().getResourceAsStream("/images/settings.png")));
-        settingsIcon.setFitWidth(24);
-        settingsIcon.setFitHeight(24);
-        settingButton.setGraphic(settingsIcon);
-
-        // 给staticsButton加图标和文字
-        ImageView staticsIcon = new ImageView(new Image(getClass().getResourceAsStream("/images/statics.png")));
-        staticsIcon.setFitWidth(24);
-        staticsIcon.setFitHeight(24);
-        staticsButton.setGraphic(staticsIcon);
-
-        // 初始化倒计时显示
-        updateTimerLabel();
-
     }
 
     /**
