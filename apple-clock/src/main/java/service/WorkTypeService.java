@@ -5,6 +5,7 @@ import repository.WorkTypeRepository;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class WorkTypeService {
@@ -39,19 +40,21 @@ public void deleteType(List<Long> ids){
 }
 
 public WorkType update(WorkType workType){
-    List<WorkType> list = getAllTypes();
-    boolean duplicate = false;
-    for (WorkType i:list) {
-        if (workType.getName().equals(i.getName())&& !i.getId().equals(workType.getId())) {
-            duplicate = true;
-            break;
+    // ① 查重
+    for (WorkType wt : getAllTypes()) {
+        if (workType.getName().equals(wt.getName())
+                && !Objects.equals(wt.getId(), workType.getId())) {
+            System.out.println("Duplicate type name, please enter a new name");
+            return null;
         }
     }
-    if (duplicate){
-        System.out.println("Duplicate type name, please enter a new name");
-        return null;
-    }
-    return workTypeRepository.save(workType);
+
+    // ② ★ 拿托管实体再改名，避免 orphanRemoval 误删
+    WorkType managed = workTypeRepository.findById(workType.getId());
+    if (managed == null) return null;          // id 不存在
+    managed.setName(workType.getName().trim());
+
+    return workTypeRepository.save(managed);
 }
 
     /**

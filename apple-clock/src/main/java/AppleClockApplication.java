@@ -29,13 +29,18 @@ public class AppleClockApplication extends Application {
 
         // 加载 FXML 布局
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/MainView.fxml"));
+        loader.setControllerFactory(type -> {
+            if (type == MainController.class) {
+                MainController c = new MainController();
+                c.setWorkTypeService(workTypeService);
+                c.setWorkLogsService(workLogsService);
+                return c;
+            }
+            try { return type.getDeclaredConstructor().newInstance(); }
+            catch (Exception e) { throw new RuntimeException(e); }
+        });
         Scene scene = new Scene(loader.load());
-
-        // 给 Controller 注入 Service
         MainController controller = loader.getController();
-        controller.setWorkTypeService(workTypeService);
-        controller.setWorkLogsService(workLogsService);
-        controller.initData();
 
         // 配置主舞台
         primaryStage.setTitle("Apple Clock");
@@ -45,6 +50,9 @@ public class AppleClockApplication extends Application {
         primaryStage.setMinHeight(400);
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        primaryStage.setOnCloseRequest(ev -> controller.handleStop());
+        controller.initData();
     }
 
 

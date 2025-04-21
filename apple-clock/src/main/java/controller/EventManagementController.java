@@ -116,17 +116,20 @@ public class EventManagementController {
         boolean hasError = false;
 
         for (var node : workTypeList.getChildren()) {
-            if (node instanceof AnchorPane card && card.getUserData() instanceof CardData data) {
-                String newName = data.nameField.getText();
-                if (newName != null && !newName.trim().isEmpty()) {
-                    WorkType updatedType = new WorkType();
-                    updatedType.setId(data.id);
-                    updatedType.setName(newName.trim());
+            if (node instanceof AnchorPane card
+                    && card.getUserData() instanceof CardData data) {
 
-                    WorkType result = workTypeService.update(updatedType);
-                    if (result == null) {
+                String newName = data.nameField.getText().trim();
+                if (!newName.isEmpty()) {
+
+                    // ★ 直接用 id + name 调 update
+                    WorkType updated = new WorkType();
+                    updated.setId(data.id);
+                    updated.setName(newName);
+
+                    if (workTypeService.update(updated) == null) {
                         hasError = true;
-                        break; // 出现重复，直接停止保存
+                        break;
                     }
                 }
             }
@@ -178,4 +181,6 @@ public class EventManagementController {
         Stage stage = (Stage) backButton.getScene().getWindow();
         stage.close();
     }
+
+
 }

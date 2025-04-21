@@ -6,7 +6,6 @@
              version="3.0">
 
     <persistence-unit name="apple-clock-unit">
-        <class>model.User</class>
         <class>model.WorkType</class>
         <class>model.WorkLogs</class>
         <class>model.Misc</class>
@@ -14,7 +13,7 @@
         <properties>
             <!-- 数据库连接 -->
             <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:appleclockdb;DB_CLOSE_DELAY=-1"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:file:./appleclockdb;AUTO_SERVER=TRUE"/>
             <property name="jakarta.persistence.jdbc.user" value="sa"/>
             <property name="jakarta.persistence.jdbc.password" value=""/>
 

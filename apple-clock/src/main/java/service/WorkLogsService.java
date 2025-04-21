@@ -44,8 +44,11 @@ public class WorkLogsService {
             return null;
         }
         log.setEnd(LocalDateTime.now());
-        Duration duration = Duration.between(log.getBegin(), log.getEnd());
-        log.setDuration((int) duration.toMinutes());
+
+        long seconds = Duration.between(log.getBegin(), log.getEnd()).getSeconds();
+        int minutes  = Math.max(1, (int) Math.ceil(seconds / 60.0)); // ★ 向上取整，至少 1
+        log.setDuration(minutes);
+
         return workLogsRepository.save(log);
     }
 
@@ -55,22 +58,25 @@ public class WorkLogsService {
     }
 
     public List<WorkLogs> findByDateRangeAndWorkNames(LocalDate s, LocalDate e, List<String> workNames) {
-        /* 1️⃣ 空集合 → 返回空，跟其他 DAO 方法保持一致 */
+        /*  空集合 → 返回空，跟其他 DAO 方法保持一致 */
         if (workNames == null || workNames.isEmpty()) {
             return Collections.emptyList();
         }
 
-        /* 2️⃣ 把名称列表映射成 WorkType 实体列表 */
+        /*  把名称列表映射成 WorkType 实体列表 */
         List<WorkType> typeEntities = workTypeRepository.findAll().stream()
                 .filter(wt -> workNames.contains(wt.getName()))
-                .toList();             // Java 16+；如果低版本改用 collect(Collectors.toList())
+                .toList();
 
         if (typeEntities.isEmpty()) {  // 数据库里压根没有这些名字
             return Collections.emptyList();
         }
 
-        /* 3️⃣ 复用已有 DAO 方法 */
+        /* 复用已有 DAO 方法 */
         return workLogsRepository.findByDateRangeAndWorkType(
                 s, e, typeEntities);
+    }
+    public List<WorkLogs> findByDateRange(LocalDate begin, LocalDate end){
+        return workLogsRepository.findByDateRange(begin, end);
     }
 }

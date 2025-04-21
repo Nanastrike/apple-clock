@@ -7,10 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.Spinner;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -108,6 +105,8 @@ public class MainController implements Initializable {
 
         // 初始化倒计时显示
         updateTimerLabel();
+        minuteSpinner.setValueFactory(
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 240, 30)); // 1~240 分钟，默认 30
     }
 
 
@@ -136,25 +135,43 @@ public class MainController implements Initializable {
 
     @FXML
     public void handleStart() {
-        if (timeline == null || isPaused) {
-            startTimer();
-            // 调用后端开始记录
-            String selectedTypeName = workTypeComboBox.getSelectionModel().getSelectedItem();
-            if (selectedTypeName != null) {
-                WorkType selectedType = workTypeService.findByName(selectedTypeName);
-                if (selectedType != null) {
-                    currentLog = workLogsService.startLog(selectedType.getId());
-                } else {
-                    System.out.println("找不到对应的事件类型！");
-                }
-            } else {
-                System.out.println("请选择一个事件类型！");
-            }
+
+        // ⓐ 已在计时但「暂停」状态 → 继续播放
+        if (timeline != null && isPaused) {
+            timeline.play();
+            isPaused = false;
+            startButton.setDisable(true);
+            pauseButton.setDisable(false);
+            return;
         }
-        startButton.setDisable(true);
-        pauseButton.setDisable(false);
-        stopButton.setDisable(false);
+
+        // ⓑ 第一次开始或上一次 Stop 后
+        if (timeline == null) {
+            // 读取下拉框事件类型
+            String selectedTypeName = workTypeComboBox.getSelectionModel().getSelectedItem();
+            if (selectedTypeName == null) {
+                System.out.println("请选择一个事件类型！");
+                return;
+            }
+
+            // 写数据库：新建 WorkLogs
+            WorkType selectedType = workTypeService.findByName(selectedTypeName);
+            if (selectedType == null) {
+                System.out.println("找不到对应的事件类型！");
+                return;
+            }
+            currentLog = workLogsService.startLog(selectedType.getId());
+
+            // 启动倒计时
+            startTimer();
+
+            // UI 按钮状态
+            startButton.setDisable(true);
+            pauseButton.setDisable(false);
+            stopButton.setDisable(false);
+        }
     }
+
 
 
     /**
@@ -197,19 +214,21 @@ public class MainController implements Initializable {
      * 启动倒计时。
      */
     private void startTimer() {
-        timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
+        timeline = new Timeline(new KeyFrame(javafx.util.Duration.seconds(1), e -> {
             remainingSeconds--;
             updateTimerLabel();
+
             if (remainingSeconds <= 0) {
-                timeline.stop();
-                System.out.println("计时结束！");
-                // 这里将来可以加播放音效、弹窗提示等
+                // 自动结束并写库
+                handleStop();          // ← ★ 直接复用
+                System.out.println("计时结束并已保存记录！");
             }
         }));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
         isPaused = false;
     }
+
 
     /**
      * 更新时间显示文字。

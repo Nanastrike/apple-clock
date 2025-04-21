@@ -1,67 +1,43 @@
 package repository;
 
+import jakarta.persistence.EntityManager;
 import model.WorkType;
-import repository.WorkTypeRepository;
-import util.HibernateUtil;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import util.JpaUtil;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class WorkTypeRepositoryImpl implements WorkTypeRepository {
 
+    /* ★ 用同一个 EntityManager，这里千万不要再用 HibernateUtil */
+    private final EntityManager em = JpaUtil.getEntityManager();
+
     @Override
-    public WorkType save(WorkType workType) {
-        Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
-            session.saveOrUpdate(workType); // 新增或更新
-            tx.commit();
-            return workType;
-        } catch (Exception e) {
-            if (tx != null) tx.rollback();
-            e.printStackTrace();
-            return null;
+    public WorkType save(WorkType wt) {
+        em.getTransaction().begin();
+        if (wt.getId() == null) {
+            em.persist(wt);           // 新增
+        } else {
+            wt = em.merge(wt);        // 更新
         }
+        em.getTransaction().commit();
+        return wt;
     }
 
     @Override
     public List<WorkType> findAll() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.createQuery("FROM WorkType", WorkType.class).list();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return em.createQuery("FROM WorkType", WorkType.class).getResultList();
     }
 
     @Override
     public void deleteById(Long id) {
-        Transaction tx = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
-            WorkType workType = session.get(WorkType.class, id);
-            if (workType != null) {
-                session.delete(workType);
-            }
-            tx.commit();
-        } catch (Exception e) {
-            if (tx != null) tx.rollback();
-            e.printStackTrace();
-        }
+        em.getTransaction().begin();
+        WorkType wt = em.find(WorkType.class, id);
+        if (wt != null) em.remove(wt);
+        em.getTransaction().commit();
     }
 
     @Override
     public WorkType findById(Long id) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.get(WorkType.class, id);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return em.find(WorkType.class, id);
     }
-
-
 }

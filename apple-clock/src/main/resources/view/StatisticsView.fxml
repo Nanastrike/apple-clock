@@ -15,26 +15,12 @@
 
             <!-- 第一行：标题 & 视图切换 -->
             <HBox alignment="CENTER_LEFT" spacing="10">
-                <Label text="统计"
-                       style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
-                <Button fx:id="toggleViewButton"
-                        text="☰"
-                        onAction="#handleToggleView"/>
+                <Button fx:id="selectDateRangeButton" text="选择时间范围" onAction="#onDateRangeButtonClicked"/>
+                <Button text="筛选事件" onAction="#openWorkTypeSelection"/>
+                <Button fx:id="toggleViewButton" text="切换视图" onAction="#handleToggleView"/>
             </HBox>
 
-            <!-- 第二行：事件筛选 & 时间范围 -->
-            <HBox alignment="CENTER_LEFT" spacing="20">
 
-                <!-- 事件筛选 -->
-                <Button fx:id="selectEventsButton"
-                        text="选择事件"
-                        onAction="#openWorkTypeSelection"/>
-
-                <!-- 时间范围选择 -->
-                <Button fx:id="selectDateRangeButton"
-                        text="选择时间范围"
-                        onAction="#onDateRangeButtonClicked"/>
-            </HBox>
 
             <!-- 隐藏的日期范围弹出面板 -->
             <VBox fx:id="dateRangePanel"
@@ -66,9 +52,10 @@
         <StackPane>
 
             <!-- 饼图 & 其下方累计记录 -->
-            <VBox fx:id="statsContainer" spacing="10" alignment="TOP_CENTER" visible="true">
-                <PieChart fx:id="pieChart"/>
-                <ScrollPane fx:id="recordsScrollPane" fitToWidth="true" prefHeight="200">
+            <VBox fx:id="statsContainer" spacing="10" alignment="TOP_CENTER" >
+                <PieChart fx:id="pieChart" prefHeight="400" prefWidth="400"/>
+                <Label fx:id="noDataLabel" alignment="CENTER" text="No Records Found" visible="false" style="-fx-text-fill: grey; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+                <ScrollPane fx:id="recordsScrollPane" fitToWidth="true" >
                     <VBox fx:id="recordsContainer" spacing="6" />
                 </ScrollPane>
             </VBox>

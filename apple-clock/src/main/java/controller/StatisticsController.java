@@ -5,9 +5,11 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import model.WorkLogs;
 import model.WorkType;
+import org.controlsfx.control.CheckListView;
 import repository.WorkLogsRepositoryImpl;
 import repository.WorkTypeRepository;
 import repository.WorkTypeRepositoryImpl;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
  */
 public class StatisticsController {
 
+    public VBox statsContainer;
     /* ---------- FXML 节点 ---------- */
     @FXML private Button selectDateRangeButton;
     @FXML private VBox   dateRangePanel;
@@ -38,6 +41,11 @@ public class StatisticsController {
     @FXML private VBox logListContainer;
 
     @FXML private Button toggleViewButton;
+    @FXML
+    private Label noDataLabel;
+    @FXML
+    private StackPane chartContainer;
+
 
     /* ---------- 业务数据 ---------- */
     /** 所有事件名列表（由服务层提供） */
@@ -61,38 +69,46 @@ public class StatisticsController {
         // 拿到所有事件名
         workTypeNames = workTypeService.getAllWorkTypeNames();
         selectedWorkTypes.addAll(workTypeNames);
-        refreshPieChart();
 
         // 默认显示过去 7 天
         onLast7DaysClicked();
-        updateDateButtonText();
-        refreshPieChart();
+        onConfirmDateRange();
     }
 
     /* ---------- 日期面板 ---------- */
-    @FXML private void onDateRangeButtonClicked() { dateRangePanel.setVisible(true); }
+    @FXML private void onDateRangeButtonClicked() {
+        dateRangePanel.setVisible(!dateRangePanel.isVisible());
+    }
 
     @FXML private void onTodayClicked() {
         LocalDate d = LocalDate.now();
         startDatePicker.setValue(d);
         endDatePicker.setValue(d);
+        onConfirmDateRange();
     }
     @FXML private void onYesterdayClicked() {
         LocalDate d = LocalDate.now().minusDays(1);
         startDatePicker.setValue(d);
         endDatePicker.setValue(d);
+        onConfirmDateRange();
     }
     @FXML private void onLast7DaysClicked() {
         LocalDate d = LocalDate.now();
         startDatePicker.setValue(d.minusDays(6));
         endDatePicker.setValue(d);
+        onConfirmDateRange();
     }
     @FXML private void onLast30DaysClicked() {
         LocalDate d = LocalDate.now();
         startDatePicker.setValue(d.minusDays(29));
         endDatePicker.setValue(d);
+        onConfirmDateRange();
     }
 
+    /**
+     * 日历的确认按钮
+     * 日期为空or结束时间>开始时间时有错误提示
+     */
     @FXML private void onConfirmDateRange() {
         LocalDate s = startDatePicker.getValue();
         LocalDate e = endDatePicker.getValue();
@@ -118,17 +134,22 @@ public class StatisticsController {
         dialog.getDialogPane().getButtonTypes()
                 .addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        ListView<String> listView = new ListView<>();
-        listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        listView.setItems(FXCollections.observableArrayList(workTypeNames));
-        // 保留之前的选择
-        selectedWorkTypes.forEach(t -> listView.getSelectionModel().select(t));
+        // ★ 1. 创建 CheckListView
+        CheckListView<String> clv = new CheckListView<>(
+                FXCollections.observableArrayList(workTypeNames));
 
-        dialog.getDialogPane().setContent(listView);
-        dialog.setResultConverter(btn -> btn == ButtonType.OK
-                ? new ArrayList<>(listView.getSelectionModel().getSelectedItems())
-                : null);
+        // ★ 2. 预选之前勾选的项
+        selectedWorkTypes.forEach(item -> clv.getCheckModel().check(item));
 
+        dialog.getDialogPane().setContent(clv);
+
+        // ★ 3. 将勾选结果转换成 List<String>
+        dialog.setResultConverter(btn -> {
+            if (btn == ButtonType.OK) {
+                return new ArrayList<>(clv.getCheckModel().getCheckedItems());
+            }
+            return null;
+        });
         dialog.showAndWait().ifPresent(sel -> {
             selectedWorkTypes.clear();
             selectedWorkTypes.addAll(sel.isEmpty() ? workTypeNames : sel);
@@ -155,27 +176,21 @@ public class StatisticsController {
         LocalDate s = startDatePicker.getValue();
         LocalDate e = endDatePicker.getValue();
 
-        if (s == null || e == null) {
-            onLast7DaysClicked();
-        }
-
-        if (s.isAfter(e)) {
-            showAlert("开始日期不能晚于结束日期！");
-            return;
-        }
-        // ★ 把名称转换成实体
-        List<WorkType> typeEntities =
-                workTypeService.findByNames(selectedWorkTypes);
-
-        // 如果一个都没选，直接清空图表
-        if (typeEntities.isEmpty()) {
-            pieChart.getData().clear();
-            recordsContainer.getChildren().clear();
-            logListContainer.getChildren().clear();
-            return;
-        }
-        List<WorkLogs> logs = workLogsService   // ← 你实例化的 service
+        List<WorkLogs> logs = workLogsService
                 .findByDateRangeAndWorkNames(s, e, selectedWorkTypes);
+
+        /* -------- 空数据时的统一处理 -------- */
+        if (logs.isEmpty()) {
+            pieChart.setVisible(false);
+            recordsScrollPane.setVisible(false);
+            logScrollPane.setVisible(false);
+            noDataLabel.setVisible(true);
+            return;                             // ★ 仅这里 return
+        }
+        /* -------- 有数据，确保控件可见 -------- */
+        pieChart.setVisible(true);
+        recordsScrollPane.setVisible(true);
+        noDataLabel.setVisible(false);
 
         /* --- 汇总每种类型的总时长 --- */
         Map<String, Integer> totalMap = logs.stream()
@@ -188,24 +203,24 @@ public class StatisticsController {
                         )));
 
         /* --- 更新饼图 --- */
+        /* --- 更新饼图 --- */
         ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
         int colorIdx = 0;
         pieChart.getData().clear();
+
         for (Map.Entry<String, Integer> entry : totalMap.entrySet()) {
-            String type    = entry.getKey();
-            int minutes    = entry.getValue();          // 直接拿到分钟
-            PieChart.Data data = new PieChart.Data(type, minutes);
-            pieData.add(data);
-
-
-            // 颜色
-            String color = pieColors[colorIdx++ % pieColors.length];
-            data.getNode().setStyle("-fx-pie-color: " + color + ";");
-
-            // 悬浮提示
-            Tooltip.install(data.getNode(),
-                    new Tooltip(type + " : " + formatDuration(minutes)));
+            pieData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
         }
+        pieChart.setData(pieData);   // ★ 先真正放进图表
+
+// ★ 现在节点已生成，再安全地设置颜色和 tooltip
+        for (PieChart.Data d : pieChart.getData()) {
+            String color = pieColors[colorIdx++ % pieColors.length];
+            d.getNode().setStyle("-fx-pie-color: " + color + ";");
+            Tooltip.install(d.getNode(),
+                    new Tooltip(d.getName() + " : " + formatDuration((int) d.getPieValue())));
+        }
+
         pieChart.setData(pieData);
 
         /* --- 更新饼图下方累计记录列表 --- */

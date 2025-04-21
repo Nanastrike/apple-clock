@@ -27,15 +27,31 @@ public class WorkLogsRepositoryImpl implements repository.WorkLogsRepository {
 
     @Override
     public WorkLogs save(WorkLogs workLogs) {
-        em.getTransaction().begin();
-        if (workLogs.getId() == null) {
-            em.persist(workLogs);
-        } else {
-            workLogs = em.merge(workLogs);
+        try {
+            em.getTransaction().begin();
+
+            if (workLogs.getId() == null) {
+                em.persist(workLogs);  // 新纪录
+            } else {
+                workLogs = em.merge(workLogs); // 更新已有纪录
+            }
+
+            em.getTransaction().commit();
+
+            System.out.println("[保存日志] ID=" + workLogs.getId()
+                    + "，类型=" + (workLogs.getWorkType() != null ? workLogs.getWorkType().getName() : "未知")
+                    + "，开始=" + workLogs.getBegin()
+                    + "，结束=" + workLogs.getEnd()
+                    + "，时长=" + workLogs.getDuration() + "秒");
+
+            return workLogs;
+        } catch (Exception e) {
+            em.getTransaction().rollback(); // 保存失败时回滚事务
+            System.err.println("保存日志失败：" + e.getMessage());
+            throw e; // 抛出去给上层处理
         }
-        em.getTransaction().commit();
-        return workLogs;
     }
+
 
     @Override
     public void delete(WorkLogs workLogs) {
