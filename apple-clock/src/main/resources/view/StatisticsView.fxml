@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.StatisticsController">
+
+    <!-- 顶部：筛选区 -->
+    <top>
+        <VBox spacing="10" padding="10">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="时间范围:" style="-fx-font-weight: bold;"/>
+                <DatePicker fx:id="startDatePicker"/>
+                <Label text="到"/>
+                <DatePicker fx:id="endDatePicker"/>
+
+                <Button text="今天" onAction="#onTodayClicked"/>
+                <Button text="昨天" onAction="#onYesterdayClicked"/>
+                <Button text="过去7天" onAction="#onLast7DaysClicked"/>
+                <Button text="过去30天" onAction="#onLast30DaysClicked"/>
+            </HBox>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="事件筛选:" style="-fx-font-weight: bold;"/>
+                <ListView fx:id="eventListView" editable="true" prefHeight="100" prefWidth="300"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- 中间内容区域 -->
+    <center>
+        <StackPane>
+            <!-- 饼图 -->
+            <PieChart fx:id="pieChart" visible="true"/>
+
+            <!-- 日志列表 -->
+            <ScrollPane fx:id="logScrollPane" visible="false">
+                <VBox fx:id="logListContainer" spacing="10" padding="10"/>
+            </ScrollPane>
+        </StackPane>
+    </center>
+
+    <!-- 右上角按钮 -->
+    <right>
+        <VBox alignment="TOP_CENTER" padding="10">
+            <Button fx:id="toggleViewButton" graphicTextGap="5" onAction="#onToggleView">
+                <graphic>
+                    <ImageView fx:id="toggleIcon" fitHeight="24" fitWidth="24"/>
+                </graphic>
+            </Button>
+        </VBox>
+    </right>
+
+</BorderPane>
