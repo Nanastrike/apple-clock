@@ -3,6 +3,8 @@ package service;
 import model.Misc;
 import repository.MiscRepository;
 
+import java.util.List;
+
 public class MiscService {
 
     private final MiscRepository miscRepository;
@@ -30,5 +32,22 @@ public class MiscService {
      */
     public Misc updateSettings(Misc misc) {
         return miscRepository.save(misc);
+    }
+
+    public Misc getMisc() {
+        List<Misc> list = miscRepository.findAll();
+        return list.isEmpty() ? null : list.get(0);
+    }
+    public void saveOrUpdateMisc(Misc misc) {
+        List<Misc> list = miscRepository.findAll();
+        if (list.isEmpty()) {
+            miscRepository.save(misc); // insert
+        } else {
+            Misc existing = list.get(0);
+            existing.setUsername(misc.getUsername());
+            existing.setThemeStyle(misc.getThemeStyle());
+            existing.setLanguage(misc.getLanguage());
+            miscRepository.save(existing); // update
+        }
     }
 }

@@ -3,7 +3,9 @@ package controller;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -11,6 +13,7 @@ import javafx.scene.control.Spinner;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import model.WorkLogs;
 import model.WorkType;
@@ -18,6 +21,7 @@ import model.WorkType;
 import service.WorkLogsService;
 import service.WorkTypeService;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
@@ -217,7 +221,21 @@ public class MainController implements Initializable {
 
     @FXML
     private void onSettingsClick() {
-        // 点击设置按钮后的逻辑，比如弹一个提示框
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/SettingView.fxml"));
+            Scene settingsScene = new Scene(loader.load());
+
+            // 新建一个新的窗口（Stage）
+            Stage settingsStage = new Stage();
+            settingsStage.setTitle("设置");
+            settingsStage.setScene(settingsScene);
+            settingsStage.setResizable(false); // 可选：如果想让设置页固定大小
+
+            settingsStage.show(); // 打开！
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println("点击了设置按钮");
     }
 

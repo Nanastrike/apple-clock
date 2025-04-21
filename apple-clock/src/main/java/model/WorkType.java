@@ -17,14 +17,12 @@ public class WorkType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-    private String color; // 颜色代码
+    private String name;// 颜色代码
 
     @OneToMany(mappedBy = "workType", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorkLogs> workLogs;
 
-    public WorkType(String color, String name) {
-        this.color = color;
+    public WorkType(String name) {
         this.name = name;
     }
 }

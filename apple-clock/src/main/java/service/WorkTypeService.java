@@ -32,8 +32,8 @@ public class WorkTypeService {
     return workTypeRepository.save(workType);
     }
 
-public void deleteType(Long id){
-        workTypeRepository.deleteById(id);
+public void deleteType(List<Long> ids){
+    ids.forEach(workTypeRepository::deleteById);
 }
 
 public WorkType update(WorkType workType){
@@ -57,9 +57,9 @@ public WorkType update(WorkType workType){
      */
     public void initializeDefaultWorkTypes() {
         if (workTypeRepository.findAll().isEmpty()){
-            WorkType learn = new WorkType("学习", "#A3BFD9");   // 莫兰迪蓝
-            WorkType draw = new WorkType("运动", "#C1A3BF");    // 莫兰迪紫
-            WorkType read = new WorkType("看书", "#A3C1A3");    // 莫兰迪绿
+            WorkType learn = new WorkType("学习");   // 莫兰迪蓝
+            WorkType draw = new WorkType("运动");    // 莫兰迪紫
+            WorkType read = new WorkType("看书");    // 莫兰迪绿
 
             workTypeRepository.save(learn);
             workTypeRepository.save(draw);

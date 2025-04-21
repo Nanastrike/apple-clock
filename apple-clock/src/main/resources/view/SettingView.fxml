@@ -1,14 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Separator?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="view.SettingView"
-            prefHeight="400.0" prefWidth="600.0">
+<VBox xmlns:fx="http://javafx.com/fxml" spacing="20" alignment="TOP_CENTER"
+      prefWidth="400.0" prefHeight="500.0" minWidth="300.0" minHeight="400.0" maxWidth="600.0" maxHeight="700.0"
+      fx:controller="controller.SettingsController">
 
-</AnchorPane>
+    <Label text="设置" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+
+    <VBox spacing="10" style="-fx-padding: 10;">
+        <Label text="主题风格" style="-fx-font-size: 16px;" />
+        <ComboBox fx:id="themeComboBox" prefWidth="200.0" />
+    </VBox>
+
+    <VBox spacing="10" style="-fx-padding: 10;">
+        <Label text="语言 Language" style="-fx-font-size: 16px;" />
+        <ComboBox fx:id="languageComboBox" prefWidth="200.0" />
+    </VBox>
+
+    <Separator />
+
+    <VBox spacing="10" style="-fx-padding: 10;">
+        <Label text="事件类型管理" style="-fx-font-size: 16px;" />
+        <Button fx:id="manageWorkTypeButton" text="管理事件类型" prefWidth="200.0"
+                onAction="#handleManageWorkTypes" maxWidth="Infinity" style="-fx-alignment: CENTER_LEFT; -fx-font-size: 16px;"
+        />
+    </VBox>
+
+    <HBox spacing="20" style="-fx-padding: 10;">
+        <Button fx:id="saveButton" text="保存" prefWidth="100.0" onAction="#handleSaveSettings"/>
+    </HBox>
+
+</VBox>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.EventManagementController">
+
+    <!-- 顶部标题栏 -->
+    <top>
+        <VBox spacing="10" >
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Button fx:id="backButton" text="← 返回" onAction="#handleBack"/>
+                <Label text="事件类型管理" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" >
+                <Button fx:id="addButton" text="+ 新增" onAction="#onAddClicked"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- 中间内容区域 -->
+    <center>
+        <VBox fx:id="workTypeList" spacing="10">
+            <!-- 动态添加事件卡片 -->
+        </VBox>
+    </center>
+
+    <!-- 底部操作栏（动态出现） -->
+    <bottom>
+        <VBox spacing="10">
+            <HBox fx:id="bottomActionBar" visible="false" alignment="CENTER">
+                <Button fx:id="deleteButton" text="删除所选" onAction="#onDeleteClicked"/>
+                <Button fx:id="cancelButton" text="取消选择" onAction="#onCancelClicked"/>
+            </HBox>
+            <Button fx:id="saveButton" text="保存" onAction="#onSaveClicked" maxWidth="Infinity"/>
+        </VBox>
+    </bottom>
+
+</BorderPane>
