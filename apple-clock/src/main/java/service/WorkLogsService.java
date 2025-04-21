@@ -1,12 +1,15 @@
 package service;
 
+import jakarta.persistence.TypedQuery;
 import model.WorkLogs;
 import model.WorkType;
 import repository.WorkLogsRepository;
 import repository.WorkTypeRepository;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 public class WorkLogsService {
@@ -49,5 +52,25 @@ public class WorkLogsService {
     // 查询最近三条记录
     public List<WorkLogs> getRecentLogs() {
         return workLogsRepository.findTop3OrderByBeginDesc();
+    }
+
+    public List<WorkLogs> findByDateRangeAndWorkNames(LocalDate s, LocalDate e, List<String> workNames) {
+        /* 1️⃣ 空集合 → 返回空，跟其他 DAO 方法保持一致 */
+        if (workNames == null || workNames.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        /* 2️⃣ 把名称列表映射成 WorkType 实体列表 */
+        List<WorkType> typeEntities = workTypeRepository.findAll().stream()
+                .filter(wt -> workNames.contains(wt.getName()))
+                .toList();             // Java 16+；如果低版本改用 collect(Collectors.toList())
+
+        if (typeEntities.isEmpty()) {  // 数据库里压根没有这些名字
+            return Collections.emptyList();
+        }
+
+        /* 3️⃣ 复用已有 DAO 方法 */
+        return workLogsRepository.findByDateRangeAndWorkType(
+                s, e, typeEntities);
     }
 }

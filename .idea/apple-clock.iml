@@ -6,7 +6,9 @@
   <component name="FacetManager">
     <facet type="hibernate" name="Hibernate">
       <configuration>
-        <datasource-map />
+        <datasource-map>
+          <unit-entry name="hibernate.cfg.xml" value="2416e4d6-c0b0-4b52-b3ea-258bf63a0d1d" />
+        </datasource-map>
         <naming-strategy-map />
         <deploymentDescriptor name="hibernate.cfg.xml" url="file://$MODULE_DIR$/apple-clock/src/main/resources/hibernate.cfg.xml" />
       </configuration>

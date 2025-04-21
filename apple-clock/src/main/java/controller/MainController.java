@@ -5,6 +5,7 @@ import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -241,7 +242,17 @@ public class MainController implements Initializable {
 
     @FXML
     private void onStatisticsClick() {
-        // 点击统计按钮后的逻辑
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/StatisticsView.fxml"));
+            Parent statisticsPage = loader.load();
+
+            Stage stage = new Stage();
+            stage.setTitle("统计");
+            stage.setScene(new Scene(statisticsPage));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println("点击了统计按钮");
     }
 

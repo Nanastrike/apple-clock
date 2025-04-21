@@ -3,7 +3,9 @@ package service;
 import model.WorkType;
 import repository.WorkTypeRepository;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class WorkTypeService {
     private final WorkTypeRepository workTypeRepository;
@@ -81,4 +83,24 @@ public WorkType update(WorkType workType){
         return null; // 找不到就返回 null
     }
 
+    public List<WorkType> findByNames(List<String> names) {
+        if (names == null || names.isEmpty()) {
+            return Collections.emptyList();          // 空集合 → 返回空
+        }
+        return workTypeRepository.findAll().stream()
+                .filter(wt -> names.contains(wt.getName()))
+                .collect(Collectors.toList());
+    }
+
+
+    public List<String> getAllWorkTypeNames() {
+// 从仓库取出全部 WorkType，然后映射成名字列表
+        List<WorkType> allTypes = workTypeRepository.findAll();
+        if (allTypes == null || allTypes.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return allTypes.stream()
+                .map(WorkType::getName)
+                .collect(Collectors.toList());
+    }
 }

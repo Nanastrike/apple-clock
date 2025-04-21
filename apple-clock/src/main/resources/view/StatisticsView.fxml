@@ -1,60 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.*?>
 
-<?import org.controlsfx.control.CheckComboBox?>
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.StatisticsController">
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controller.StatisticsController"
+            prefWidth="900" prefHeight="600">
 
-    <!-- 顶部 -->
+    <!-- 顶部工具区 -->
     <top>
-        <VBox spacing="10" padding="10">
-            <!-- 第一行：标题 + 切换视图按钮 -->
+        <VBox spacing="10">
+
+            <!-- 第一行：标题 & 视图切换 -->
             <HBox alignment="CENTER_LEFT" spacing="10">
-                <Label text="统计" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
-                <Button fx:id="toggleViewButton" text="☰" onAction="#handleToggleView"/>
+                <Label text="统计"
+                       style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                <Button fx:id="toggleViewButton"
+                        text="☰"
+                        onAction="#handleToggleView"/>
             </HBox>
 
-            <!-- 事件筛选多选框 -->
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <Label text="事件筛选：" style="-fx-font-weight: bold;"/>
-                <Button fx:id="selectEventsButton" text="选择事件" onAction="#openWorkTypeSelection"/>
+            <!-- 第二行：事件筛选 & 时间范围 -->
+            <HBox alignment="CENTER_LEFT" spacing="20">
+
+                <!-- 事件筛选 -->
+                <Button fx:id="selectEventsButton"
+                        text="选择事件"
+                        onAction="#openWorkTypeSelection"/>
+
+                <!-- 时间范围选择 -->
+                <Button fx:id="selectDateRangeButton"
+                        text="选择时间范围"
+                        onAction="#onDateRangeButtonClicked"/>
             </HBox>
 
-            <!-- 隐藏的事件选择弹出面板 -->
-            <VBox fx:id="workTypeSelectionPanel" spacing="10"
-                  style="-fx-background-color: #FFFFFF; -fx-border-color: #CCCCCC; -fx-border-radius: 8;" padding="10"
-                  visible="false">
-                <Label text="请选择要显示的事件" style="-fx-font-size: 16px;"/>
-                <ListView fx:id="workTypeListView" prefHeight="200"/>
-                <HBox spacing="10" alignment="CENTER">
-                    <Button text="确认" onAction="#onConfirmWorkType"/>
-                    <Button text="取消" onAction="#onCancelWorkType"/>
-                </HBox>
-            </VBox>
-
-            <!-- 第二行：时间范围选择按钮 -->
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <Button fx:id="selectDateRangeButton" text="选择时间范围" onAction="#onDateRangeButtonClicked"/>
-            </HBox>
-
-            <!-- 隐藏的时间范围弹出面板 -->
-            <VBox fx:id="dateRangePanel" spacing="10"
-                  style="-fx-background-color: #FFFFFF; -fx-border-color: #CCCCCC; -fx-border-radius: 8;" padding="10"
-                  visible="false">
+            <!-- 隐藏的日期范围弹出面板 -->
+            <VBox fx:id="dateRangePanel"
+                  spacing="10"
+                  visible="false"
+                  style="-fx-background-color: #FFFFFF; -fx-border-color: #CCCCCC; -fx-border-radius: 8;">
                 <HBox spacing="10" alignment="CENTER">
                     <DatePicker fx:id="startDatePicker"/>
                     <Label text="到"/>
                     <DatePicker fx:id="endDatePicker"/>
                 </HBox>
+
                 <HBox spacing="10" alignment="CENTER">
-                    <Button text="今天" onAction="#onTodayClicked"/>
-                    <Button text="昨天" onAction="#onYesterdayClicked"/>
-                    <Button text="过去7天" onAction="#onLast7DaysClicked"/>
-                    <Button text="过去30天" onAction="#onLast30DaysClicked"/>
+                    <Button text="今天"      onAction="#onTodayClicked"/>
+                    <Button text="昨天"      onAction="#onYesterdayClicked"/>
+                    <Button text="过去7天"   onAction="#onLast7DaysClicked"/>
+                    <Button text="过去30天"  onAction="#onLast30DaysClicked"/>
                 </HBox>
+
                 <HBox alignment="CENTER">
                     <Button text="确定" onAction="#onConfirmDateRange"/>
                 </HBox>
@@ -62,28 +61,22 @@
         </VBox>
     </top>
 
-    <!-- 中间内容区域 -->
+    <!-- 中心内容区：饼图 + 历史记录 / 日志两种互斥视图 -->
     <center>
         <StackPane>
-            <!-- 饼图 -->
-            <PieChart fx:id="pieChart" visible="true"/>
 
-            <!-- 日志列表 -->
-            <ScrollPane fx:id="logScrollPane" visible="false">
-                <VBox fx:id="logListContainer" spacing="10" padding="10"/>
+            <!-- 饼图 & 其下方累计记录 -->
+            <VBox fx:id="statsContainer" spacing="10" alignment="TOP_CENTER" visible="true">
+                <PieChart fx:id="pieChart"/>
+                <ScrollPane fx:id="recordsScrollPane" fitToWidth="true" prefHeight="200">
+                    <VBox fx:id="recordsContainer" spacing="6" />
+                </ScrollPane>
+            </VBox>
+
+            <!-- 按日分组的日志视图（默认隐藏，切换按钮后显示） -->
+            <ScrollPane fx:id="logScrollPane" fitToWidth="true" visible="false">
+                <VBox fx:id="logListContainer" spacing="10"/>
             </ScrollPane>
         </StackPane>
     </center>
-    <VBox fx:id="LogsView" visible="false"/>
-    <!--展示类似于log的造型
-        按 日期分组（比如 2025/04/20、2025/04/19）
-每个日期下有若干条事件
-每条事件显示：
-时间（比如 13:00）
-事件名称（比如 学习）
-持续时长（比如 2h15m）
-过去7天内的所有事件
-按时间排序（最新的在上面）-->
-
-
 </BorderPane>

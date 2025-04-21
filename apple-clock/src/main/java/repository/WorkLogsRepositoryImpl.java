@@ -8,7 +8,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class WorkLogsRepositoryImpl implements repository.WorkLogsRepository {
@@ -97,20 +97,29 @@ public class WorkLogsRepositoryImpl implements repository.WorkLogsRepository {
     }
 
     @Override
-    public List<WorkLogs> findByDateAndWorkType(LocalDate date, WorkType workType) {
+    public List<WorkLogs> findByDateAndWorkType(LocalDate date, List<WorkType> workTypes) {
+        if (workTypes == null || workTypes.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         LocalDateTime start = date.atStartOfDay();
-        LocalDateTime end = date.plusDays(1).atStartOfDay();
+        LocalDateTime end   = date.plusDays(1).atStartOfDay();
 
         TypedQuery<WorkLogs> query = em.createQuery(
-                "SELECT wl FROM WorkLogs wl WHERE wl.begin >= :start AND wl.begin < :end AND wl.workType = :workType",
+                "SELECT wl " +
+                        "FROM   WorkLogs wl " +
+                        "WHERE  wl.begin >= :start " +
+                        "  AND  wl.begin <  :end " +
+                        "  AND  wl.workType IN :workTypes",   // ★ 用 IN
                 WorkLogs.class
         );
         query.setParameter("start", start);
-        query.setParameter("end", end);
-        query.setParameter("workType", workType);
+        query.setParameter("end",   end);
+        query.setParameter("workTypes", workTypes);   // ★ 直接传 List
 
         return query.getResultList();
     }
+
 
     @Override
     public List<WorkLogs> findByDurationGreaterThanEqual(int durationMinutes) {
@@ -122,18 +131,29 @@ public class WorkLogsRepositoryImpl implements repository.WorkLogsRepository {
         return query.getResultList();
     }
 
+
+
     @Override
-    public List<WorkLogs> findByDateRangeAndWorkType(LocalDate begin, LocalDate end, WorkType workType) {
+    public List<WorkLogs> findByDateRangeAndWorkType(LocalDate begin, LocalDate end,
+                                                     List<WorkType> workTypes) {
+        if (workTypes == null || workTypes.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         LocalDateTime beginDateTime = begin.atStartOfDay();
-        LocalDateTime endDateTime = end.plusDays(1).atStartOfDay(); // 包含end当天
+        LocalDateTime endDateTime   = end.plusDays(1).atStartOfDay(); // 包含 end 当天
 
         TypedQuery<WorkLogs> query = em.createQuery(
-                "SELECT wl FROM WorkLogs wl WHERE wl.begin >= :start AND wl.begin < :end AND wl.workType = :workType",
+                "SELECT wl " +
+                        "FROM   WorkLogs wl " +
+                        "WHERE  wl.begin >= :start " +
+                        "  AND  wl.begin <  :end " +
+                        "  AND  wl.workType IN :workTypes",
                 WorkLogs.class
         );
         query.setParameter("start", beginDateTime);
-        query.setParameter("end", endDateTime);
-        query.setParameter("workType", workType);
+        query.setParameter("end",   endDateTime);
+        query.setParameter("workTypes", workTypes);
 
         return query.getResultList();
     }
