@@ -5,27 +5,60 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.geometry.Insets?>
 
+<?import org.controlsfx.control.CheckComboBox?>
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.StatisticsController">
 
-    <!-- 顶部：筛选区 -->
+    <!-- 顶部 -->
     <top>
         <VBox spacing="10" padding="10">
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <Label text="时间范围:" style="-fx-font-weight: bold;"/>
-                <DatePicker fx:id="startDatePicker"/>
-                <Label text="到"/>
-                <DatePicker fx:id="endDatePicker"/>
-
-                <Button text="今天" onAction="#onTodayClicked"/>
-                <Button text="昨天" onAction="#onYesterdayClicked"/>
-                <Button text="过去7天" onAction="#onLast7DaysClicked"/>
-                <Button text="过去30天" onAction="#onLast30DaysClicked"/>
+            <!-- 第一行：标题 + 切换视图按钮 -->
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="统计" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                <Button fx:id="toggleViewButton" text="☰" onAction="#handleToggleView"/>
             </HBox>
 
+            <!-- 事件筛选多选框 -->
             <HBox spacing="10" alignment="CENTER_LEFT">
-                <Label text="事件筛选:" style="-fx-font-weight: bold;"/>
-                <ListView fx:id="eventListView" editable="true" prefHeight="100" prefWidth="300"/>
+                <Label text="事件筛选：" style="-fx-font-weight: bold;"/>
+                <Button fx:id="selectEventsButton" text="选择事件" onAction="#openWorkTypeSelection"/>
             </HBox>
+
+            <!-- 隐藏的事件选择弹出面板 -->
+            <VBox fx:id="workTypeSelectionPanel" spacing="10"
+                  style="-fx-background-color: #FFFFFF; -fx-border-color: #CCCCCC; -fx-border-radius: 8;" padding="10"
+                  visible="false">
+                <Label text="请选择要显示的事件" style="-fx-font-size: 16px;"/>
+                <ListView fx:id="workTypeListView" prefHeight="200"/>
+                <HBox spacing="10" alignment="CENTER">
+                    <Button text="确认" onAction="#onConfirmWorkType"/>
+                    <Button text="取消" onAction="#onCancelWorkType"/>
+                </HBox>
+            </VBox>
+
+            <!-- 第二行：时间范围选择按钮 -->
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Button fx:id="selectDateRangeButton" text="选择时间范围" onAction="#onDateRangeButtonClicked"/>
+            </HBox>
+
+            <!-- 隐藏的时间范围弹出面板 -->
+            <VBox fx:id="dateRangePanel" spacing="10"
+                  style="-fx-background-color: #FFFFFF; -fx-border-color: #CCCCCC; -fx-border-radius: 8;" padding="10"
+                  visible="false">
+                <HBox spacing="10" alignment="CENTER">
+                    <DatePicker fx:id="startDatePicker"/>
+                    <Label text="到"/>
+                    <DatePicker fx:id="endDatePicker"/>
+                </HBox>
+                <HBox spacing="10" alignment="CENTER">
+                    <Button text="今天" onAction="#onTodayClicked"/>
+                    <Button text="昨天" onAction="#onYesterdayClicked"/>
+                    <Button text="过去7天" onAction="#onLast7DaysClicked"/>
+                    <Button text="过去30天" onAction="#onLast30DaysClicked"/>
+                </HBox>
+                <HBox alignment="CENTER">
+                    <Button text="确定" onAction="#onConfirmDateRange"/>
+                </HBox>
+            </VBox>
         </VBox>
     </top>
 
@@ -41,16 +74,16 @@
             </ScrollPane>
         </StackPane>
     </center>
+    <VBox fx:id="LogsView" visible="false"/>
+    <!--展示类似于log的造型
+        按 日期分组（比如 2025/04/20、2025/04/19）
+每个日期下有若干条事件
+每条事件显示：
+时间（比如 13:00）
+事件名称（比如 学习）
+持续时长（比如 2h15m）
+过去7天内的所有事件
+按时间排序（最新的在上面）-->
 
-    <!-- 右上角按钮 -->
-    <right>
-        <VBox alignment="TOP_CENTER" padding="10">
-            <Button fx:id="toggleViewButton" graphicTextGap="5" onAction="#onToggleView">
-                <graphic>
-                    <ImageView fx:id="toggleIcon" fitHeight="24" fitWidth="24"/>
-                </graphic>
-            </Button>
-        </VBox>
-    </right>
 
 </BorderPane>

@@ -55,6 +55,11 @@
             <version>1.18.28</version> <!-- ⭐加上版本号，很重要 -->
             <scope>provided</scope> <!-- 只在编译期使用 -->
         </dependency>
+        <dependency>
+            <groupId>org.controlsfx</groupId>
+            <artifactId>controlsfx</artifactId>
+            <version>11.1.2</version> <!-- 跟你的JavaFX版本匹配 -->
+        </dependency>
     </dependencies>
 
     <build>
