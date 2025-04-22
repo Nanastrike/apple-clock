@@ -28,11 +28,19 @@ public class EventManagementController {
 
     @FXML
     private Button backButton;
+    @FXML private HBox bottomActionBar;
+    @FXML private Button saveButton;
 
     private final ObservableList<WorkType> workTypes = FXCollections.observableArrayList();
     private final List<Long> selectedIds = new ArrayList<>();
 
     private WorkTypeService workTypeService;
+
+    @FXML
+    private void initialize() {
+        // 确保第一页加载时能根据 selectedIds 正确显示
+        updateActionButtonsVisibility();
+    }
 
     public void setWorkTypeService(WorkTypeService service) {
         this.workTypeService = service;
@@ -93,8 +101,18 @@ public class EventManagementController {
 
     private void updateActionButtonsVisibility() {
         boolean hasSelection = !selectedIds.isEmpty();
+
+        // 原来只切子按钮
         deleteButton.setVisible(hasSelection);
         cancelButton.setVisible(hasSelection);
+
+        // 现在让整条底部横条出现／消失
+        bottomActionBar.setVisible(hasSelection);
+        bottomActionBar.setManaged(hasSelection);
+
+        // 没选中时，只显示「保存」；选中时隐藏「保存」
+        saveButton.setVisible(!hasSelection);
+        saveButton.setManaged(!hasSelection);
     }
 
     private void checkAddButtonStatus() {

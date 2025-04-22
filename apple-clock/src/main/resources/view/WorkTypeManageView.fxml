@@ -28,7 +28,7 @@
     <!-- 底部操作栏（动态出现） -->
     <bottom>
         <VBox spacing="10">
-            <HBox fx:id="bottomActionBar" visible="false" alignment="CENTER">
+            <HBox fx:id="bottomActionBar"  alignment="CENTER">
                 <Button fx:id="deleteButton" text="删除所选" onAction="#onDeleteClicked"/>
                 <Button fx:id="cancelButton" text="取消选择" onAction="#onCancelClicked"/>
             </HBox>

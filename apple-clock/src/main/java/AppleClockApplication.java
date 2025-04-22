@@ -44,10 +44,10 @@ public class AppleClockApplication extends Application {
 
         // 配置主舞台
         primaryStage.setTitle("Apple Clock");
-        primaryStage.setWidth(800);
+        primaryStage.setWidth(400);
         primaryStage.setHeight(600);
-        primaryStage.setMinWidth(600);
-        primaryStage.setMinHeight(400);
+        primaryStage.setMinWidth(400);
+        primaryStage.setMinHeight(600);
         primaryStage.setScene(scene);
         primaryStage.show();
 

@@ -18,14 +18,18 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.ComboBox?>
-<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainController">
+<BorderPane xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controller.MainController"
+            fx:resources="i18n.messages"
+            style="-fx-background-color: #fbf3e8;">
     <!-- 顶部 -->
     <top>
         <BorderPane>
             <right>
                 <VBox spacing="10" alignment="TOP_RIGHT" style="-fx-padding: 10;">
-                    <Button fx:id="settingButton" text="Settings" onAction="#onSettingsClick"/>
-                    <Button fx:id="staticsButton" text="Statics" onAction="#onStatisticsClick"/>
+                    <Button fx:id="settingButton"  onAction="#onSettingsClick"/>
+                    <Button fx:id="staticsButton"  onAction="#onStatisticsClick"/>
                 </VBox>
             </right>
         </BorderPane>
@@ -38,10 +42,10 @@
             <VBox fx:id="appleAndEventGroup" layoutX="150" layoutY="100" spacing="10" alignment="CENTER">
                 <StackPane fx:id="appleStack" alignment="CENTER">
                     <ImageView fx:id="appleImage" fitWidth="200" fitHeight="200" onMouseClicked="#onAppleClick"/>
-                    <Label fx:id="timerLabel" text="30:00" style="-fx-font-size: 30px; -fx-text-fill: #333;" translateY="-60"/>
+                    <Label fx:id="timerLabel" text="30:00" style="-fx-font-size: 35px; -fx-text-fill: #333;" translateY="-1"/>
                 </StackPane>
                 <VBox fx:id="eventSelector" spacing="5" alignment="CENTER">
-                    <Label fx:id="eventLabel" text="当前事件" style="-fx-font-size: 18px;"/>
+                    <Label fx:id="eventLabel" text="Present Work" style="-fx-font-size: 18px;"/>
                     <ComboBox fx:id="workTypeComboBox" prefWidth="150"/>
                 </VBox>
             </VBox>
@@ -49,9 +53,12 @@
             <!-- 选择时间面板 -->
             <AnchorPane fx:id="timePickerPanel" visible="false" style="-fx-background-color: rgba(0,0,0,0.5)">
                 <VBox alignment="CENTER" spacing="10" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-                    <Label text="Choose" style="-fx-text-fill: white; -fx-font-size: 18px;"/>
+                    <Label text="Please Choose a Timer" style="-fx-text-fill: white; -fx-font-size: 18px;"/>
                     <Spinner fx:id="minuteSpinner" prefWidth="100"/>
-                    <Button text="Confirm" onAction="#handleConfirmTime"/>
+                    <HBox spacing="20" alignment="CENTER">
+                        <Button text="Confirm" onAction="#handleConfirmTime"/>
+                        <Button text="Cancel" onAction="#handleCancelTime"/>
+                    </HBox>
                 </VBox>
             </AnchorPane>
         </StackPane>

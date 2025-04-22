@@ -10,6 +10,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import lombok.Setter;
 import model.Misc;
 import repository.MiscRepositoryImpl;
 import repository.WorkTypeRepositoryImpl;
@@ -39,7 +40,9 @@ public class SettingsController {
 
     @FXML
     private Button manageWorkTypeButton;
-    private WorkTypeService workTypeService = new WorkTypeService(new WorkTypeRepositoryImpl());
+    @Setter
+    private WorkTypeService workTypeService;
+    //    private WorkTypeService workTypeService = new WorkTypeService(new WorkTypeRepositoryImpl());
     private final MiscService miscService = new MiscService(new MiscRepositoryImpl());
 
     private static final Map<String, Integer> LANGUAGE_MAP = Map.of(

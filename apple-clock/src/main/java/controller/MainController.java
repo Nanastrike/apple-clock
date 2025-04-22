@@ -13,6 +13,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import lombok.Setter;
 import model.WorkLogs;
 import model.WorkType;
 
@@ -46,18 +47,12 @@ public class MainController implements Initializable {
     private int remainingSeconds = 30 * 60;
     private boolean isPaused = false;
 
+    // 提供给外部设置 Service
+    @Setter
     private WorkTypeService workTypeService;
+    @Setter
     private WorkLogsService workLogsService;
     private WorkLogs currentLog; // 当前正在进行的计时
-
-    // 提供给外部设置 Service
-    public void setWorkTypeService(WorkTypeService service) {
-        this.workTypeService = service;
-    }
-
-    public void setWorkLogsService(WorkLogsService service) {
-        this.workLogsService = service;
-    }
 
 
     /**
@@ -199,7 +194,7 @@ public class MainController implements Initializable {
         isPaused = false;
         updateTimerLabel();
 
-        // ⭐调用后端停止记录
+        //调用后端停止记录
         if (currentLog != null) {
             workLogsService.stopLog(currentLog.getId());
             currentLog = null;
@@ -245,12 +240,18 @@ public class MainController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/SettingView.fxml"));
             Scene settingsScene = new Scene(loader.load());
 
+            /* ★ 把同一个 Service 注入 Setting 控制器 */
+            SettingsController ctrl = loader.getController();
+            ctrl.setWorkTypeService(workTypeService);
+
             // 新建一个新的窗口（Stage）
             Stage settingsStage = new Stage();
             settingsStage.setTitle("设置");
             settingsStage.setScene(settingsScene);
             settingsStage.setResizable(false); // 可选：如果想让设置页固定大小
 
+            /* ★ 监听窗口关闭，刷新下拉框 */
+            settingsStage.setOnHidden(e -> refreshWorkTypeComboBox());
             settingsStage.show(); // 打开！
 
         } catch (IOException e) {
@@ -290,4 +291,25 @@ public class MainController implements Initializable {
         timePickerPanel.setVisible(false); // 隐藏选择面板
     }
 
+    @FXML
+    private void handleCancelTime(){
+        timePickerPanel.setVisible(false); // 隐藏选择面板
+    }
+
+    /** 重新从数据库加载事件类型列表，并保持当前选中项 */
+    private void refreshWorkTypeComboBox() {
+        List<WorkType> types = workTypeService.getAllTypes();
+
+        String current = workTypeComboBox.getSelectionModel().getSelectedItem();
+        workTypeComboBox.getItems().setAll(
+                types.stream().map(WorkType::getName).toList()
+        );
+
+        // 如果原来的选项还在，保持选中；否则选第一个
+        if (current != null && workTypeComboBox.getItems().contains(current)) {
+            workTypeComboBox.getSelectionModel().select(current);
+        } else if (!workTypeComboBox.getItems().isEmpty()) {
+            workTypeComboBox.getSelectionModel().selectFirst();
+        }
+    }
 }

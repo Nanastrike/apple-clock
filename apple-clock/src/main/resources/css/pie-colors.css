@@ -1,0 +1,35 @@
+/* ============ 饼图扇区 ============ */
+.chart-pie.default-color0  { -fx-pie-color: #4E79A7; }
+.chart-pie.default-color1  { -fx-pie-color: #F28E2B; }
+.chart-pie.default-color2  { -fx-pie-color: #E15759; }
+.chart-pie.default-color3  { -fx-pie-color: #76B7B2; }
+.chart-pie.default-color4  { -fx-pie-color: #59A14F; }
+.chart-pie.default-color5  { -fx-pie-color: #EDC948; }
+.chart-pie.default-color6  { -fx-pie-color: #B07AA1; }
+.chart-pie.default-color7  { -fx-pie-color: #FF9DA7; }
+.chart-pie.default-color8  { -fx-pie-color: #9C755F; }
+.chart-pie.default-color9  { -fx-pie-color: #BAB0AC; }
+.chart-pie.default-color10 { -fx-pie-color: #6A4C93; }
+.chart-pie.default-color11 { -fx-pie-color: #D33F49; }
+.chart-pie.default-color12 { -fx-pie-color: #FF8C42; }
+.chart-pie.default-color13 { -fx-pie-color: #A1C181; }
+.chart-pie.default-color14 { -fx-pie-color: #50514F; }
+
+/* ============ 图例小圆点 ============ */
+.chart-legend-item-symbol.default-color0  { -fx-background-color: #4E79A7; }
+.chart-legend-item-symbol.default-color1  { -fx-background-color: #F28E2B; }
+.chart-legend-item-symbol.default-color2  { -fx-background-color: #E15759; }
+.chart-legend-item-symbol.default-color3  { -fx-background-color: #76B7B2; }
+.chart-legend-item-symbol.default-color4  { -fx-background-color: #59A14F; }
+.chart-legend-item-symbol.default-color5  { -fx-background-color: #EDC948; }
+.chart-legend-item-symbol.default-color6  { -fx-background-color: #B07AA1; }
+.chart-legend-item-symbol.default-color7  { -fx-background-color: #FF9DA7; }
+.chart-legend-item-symbol.default-color8  { -fx-background-color: #9C755F; }
+.chart-legend-item-symbol.default-color9  { -fx-background-color: #BAB0AC; }
+.chart-legend-item-symbol.default-color10 { -fx-background-color: #6A4C93; }
+.chart-legend-item-symbol.default-color11 { -fx-background-color: #D33F49; }
+.chart-legend-item-symbol.default-color12 { -fx-background-color: #FF8C42; }
+.chart-legend-item-symbol.default-color13 { -fx-background-color: #A1C181; }
+.chart-legend-item-symbol.default-color14 { -fx-background-color: #50514F; }
+
+
