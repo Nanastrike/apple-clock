@@ -6,9 +6,19 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Shape;
 import model.WorkLogs;
 import org.controlsfx.control.CheckListView;
 import repository.WorkLogsRepositoryImpl;
@@ -18,9 +28,14 @@ import service.WorkTypeService;
 import util.BaseController;
 import util.I18nKey;
 import util.LocalizationManager;
-
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.layout.HBox;
+import javafx.scene.control.Label;
+import javafx.geometry.Pos;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class StatisticsController {
@@ -160,15 +175,22 @@ public class StatisticsController {
     // 3. 从数据库查询对应的 WorkLogs
     // 4. 生成数据集
     // 5. 设置到 PieChart 控件上
-    private void refreshPieChart() {
 
-        /* ---- 查询 ---- */
+    private static final String[] PALETTE = {
+            "#4E79A7", "#F28E2B", "#E15759", "#76B7B2",
+            "#59A14F", "#EDC948", "#B07AA1", "#FF9DA7",
+            "#9C755F", "#BAB0AC", "#6A4C93", "#D33F49",
+            "#FF8C42", "#A1C181", "#50514F"
+    };
+    private void refreshPieChart() {
+        // 1) 查询
         List<WorkLogs> logs = workLogsService.findByDateRangeAndWorkNames(
                 startDatePicker.getValue(),
                 endDatePicker.getValue(),
-                selectedWorkTypes);
+                selectedWorkTypes
+        );
 
-        /* ---- 空数据 ---- */
+        // 2) 空数据处理
         boolean empty = logs.isEmpty();
         pieChart.setVisible(!empty);
         recordsScrollPane.setVisible(!empty);
@@ -176,39 +198,75 @@ public class StatisticsController {
         noDataLabel.setVisible(empty);
         if (empty) return;
 
-        /* ---- 汇总 ---- */
+        // 3) 汇总
         Map<String,Integer> total = logs.stream()
                 .collect(Collectors.groupingBy(
                         l -> l.getWorkType().getName(),
                         LinkedHashMap::new,
-                        Collectors.reducing(0, WorkLogs::getDuration, Integer::sum)));
+                        Collectors.reducing(0, WorkLogs::getDuration, Integer::sum)
+                ));
 
-        /* ---- 饼图数据 ---- */
+        // 4) 生成饼图数据
         ObservableList<PieChart.Data> data = FXCollections.observableArrayList();
-        total.forEach((n,v)-> data.add(new PieChart.Data(n,v)));
-        pieChart.getData().setAll(data);
+        total.forEach((name, minutes) -> data.add(new PieChart.Data(name, minutes)));
+        pieChart.setData(data);
 
-        /* ---- Tooltip & Legend 提示 ---- */
-        Platform.runLater(() -> {                          // UI 节点已生成
+        // 5) 去掉内置 Legend
+        pieChart.setLegendVisible(false);
+
+        // 6) 注册 Tooltip （可选）
+        Platform.runLater(() -> {
             for (PieChart.Data d : data) {
                 Tooltip.install(d.getNode(),
                         new Tooltip(d.getName() + " : " + format(vToMin(d))));
             }
         });
 
-        /* ---- 下方累计 ---- */
+        // 7) 在右侧列表生成带色块的行
         recordsContainer.getChildren().clear();
+        List<PieChart.Data> pieData = pieChart.getData();
         total.entrySet().stream()
                 .sorted(Map.Entry.<String,Integer>comparingByValue().reversed())
-                .forEach(e -> recordsContainer.getChildren().add(
-                        new Label(e.getKey()+" — "+format(e.getValue()))));
+                .forEach(entry -> {
+                    String name = entry.getKey();
+                    int minutes = entry.getValue();
+
+                    int colorIndex = 0;
+                    for (PieChart.Data d : pieData) {
+                        if (d.getName().equals(name)) {
+                            // 找到这个 Data 对应的 Node
+                            for (String cls : d.getNode().getStyleClass()) {
+                                if (cls.startsWith("default-color")) {
+                                    // cls 形如 "default-color3"
+                                    colorIndex = Integer.parseInt(cls.substring("default-color".length()));
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    Color fill = Color.web(PALETTE[colorIndex]);
+
+                    // 小色块 + 文本
+                    Circle dot = new Circle(6, fill);
+                    Label text = new Label(name + " — " + format(minutes));
+                    text.setStyle("-fx-font-size:14px;");
+
+                    HBox row = new HBox(8, dot, text);
+                    row.setAlignment(Pos.CENTER_LEFT);
+                    recordsContainer.getChildren().add(row);
+                });
     }
 
-    /* ---------- 辅助 ---------- */
-    private static String format(int min){
-        return (min/60>0?min/60+"h":"")+(min%60)+"m";
+    // 辅助方法
+    private static String format(int min) {
+        return (min/60>0 ? min/60 + "h" : "") + (min%60) + "m";
     }
-    private static int vToMin(PieChart.Data d){ return (int)d.getPieValue(); }
-    private static void showAlert(String m){ new Alert(Alert.AlertType.WARNING,m,ButtonType.OK).showAndWait(); }
+    private static int vToMin(PieChart.Data d) {
+        return (int)d.getPieValue();
+    }
+    private static void showAlert(String m) {
+        new Alert(Alert.AlertType.WARNING, m, ButtonType.OK).showAndWait();
+    }
 
 }

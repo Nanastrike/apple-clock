@@ -32,4 +32,9 @@
 .chart-legend-item-symbol.default-color13 { -fx-background-color: #A1C181; }
 .chart-legend-item-symbol.default-color14 { -fx-background-color: #50514F; }
 
+.pie-chart .chart-legend {
+    -fx-opacity: 0;
+    -fx-pref-height: 0;
+    -fx-min-height: 0;
+}
 

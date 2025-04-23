@@ -56,7 +56,9 @@
                     <!-- 左 / 上：饼图 + 概览 -->
                     <VBox fx:id="statsContainer" spacing="10" alignment="TOP_CENTER">
                         <PieChart fx:id="pieChart"
-                                  prefHeight="400" prefWidth="400"/>
+
+                                  legendVisible="false"
+                                  VBox.vgrow="ALWAYS"/>
                         <Label fx:id="noDataLabel"
                                text="No Records Found"
                                style="-fx-text-fill: grey; -fx-font-size:16px;"
@@ -65,7 +67,7 @@
 
                     <!-- 右 / 下：累加记录列表 -->
                     <ScrollPane fx:id="recordsScrollPane" fitToWidth="true">
-                        <VBox fx:id="recordsContainer" spacing="6" />
+                        <VBox fx:id="recordsContainer" spacing="6" style="-fx-padding:10"/>
                     </ScrollPane>
                 </items>
             </SplitPane>
