@@ -12,15 +12,14 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import lombok.Setter;
 import model.WorkLogs;
 import model.WorkType;
-
+import util.BaseController;
 import service.WorkLogsService;
 import service.WorkTypeService;
 import util.LocalizationManager;
-
+import util.I18nKey;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -32,16 +31,32 @@ import java.util.ResourceBundle;
  * 控制器类，处理界面元素交互逻辑。
  */
 
-public class MainController implements Initializable {
+public class MainController extends BaseController implements Initializable {
 
     // -------------- 绑定 FXML --------------
     @FXML private ImageView appleImage;
     @FXML private Label timerLabel;
-    @FXML private Button startButton, pauseButton, stopButton;
+    @FXML @I18nKey("button.start")
+    private Button startButton;
+    @FXML @I18nKey("button.pause")
+    private Button pauseButton;
+    @FXML @I18nKey("button.stop")
+    private Button stopButton;
+    @FXML @I18nKey("main.currentType")
+    private Label eventLabel;
     @FXML private ComboBox<String> workTypeComboBox;
     @FXML private AnchorPane timePickerPanel;
     @FXML private Spinner<Integer> minuteSpinner;
-    @FXML private Button settingButton, staticsButton;
+    @FXML
+    private Button settingButton;
+    @FXML
+    private Button staticsButton;
+    @FXML @I18nKey("main.chooseTimer")
+    private Label chooseTimerLabel;
+    @FXML @I18nKey("button.confirm")
+    private Button confirmButton;
+    @FXML @I18nKey("button.cancel")
+    private Button cancelButton;
 
     // -------------- 内部变量 --------------
     private Timeline timeline;
@@ -61,8 +76,18 @@ public class MainController implements Initializable {
      */
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public void onInitialize(URL location, ResourceBundle resources) {
+        // --- original setupUI logic, without any setText(...) calls ---
         setupUI();
+        updateTimerLabel();
+        // 这时给苹果图绑定点击逻辑
+        appleImage.setOnMouseClicked(evt -> onAppleClick());
+        // 让 Spinner 可编辑，用户既能点按钮也能手动输
+        minuteSpinner.setEditable(true);
+        minuteSpinner.setValueFactory(
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 240, 30)
+        );
+        initData(); // load work types
     }
 
     private void setupUI() {
@@ -70,8 +95,6 @@ public class MainController implements Initializable {
             InputStream appleStream = MainController.class.getResourceAsStream("/images/apple_red.png");
             if (appleStream != null) {
                 appleImage.setImage(new Image(appleStream));
-            } else {
-                System.out.println("警告：apple_red.png 未找到！");
             }
 
             InputStream settingsStream = MainController.class.getResourceAsStream("/images/settings.png");
@@ -80,8 +103,6 @@ public class MainController implements Initializable {
                 settingsIcon.setFitWidth(24);
                 settingsIcon.setFitHeight(24);
                 settingButton.setGraphic(settingsIcon);
-            } else {
-                System.out.println("警告：settings.png 未找到！");
             }
 
             InputStream staticsStream = MainController.class.getResourceAsStream("/images/clocker.png");
@@ -90,12 +111,9 @@ public class MainController implements Initializable {
                 staticsIcon.setFitWidth(24);
                 staticsIcon.setFitHeight(24);
                 staticsButton.setGraphic(staticsIcon);
-            } else {
-                System.out.println("警告：statics.png 未找到！");
             }
 
         } catch (Exception e) {
-            System.out.println("加载图片时出错：" + e.getMessage());
             e.printStackTrace();
         }
 
@@ -160,6 +178,9 @@ public class MainController implements Initializable {
 
             // 启动倒计时
             startTimer();
+            // ★ 启动后：禁用苹果图和下拉框
+            appleImage.setDisable(true);
+            workTypeComboBox.setDisable(true);
 
             // UI 按钮状态
             startButton.setDisable(true);
@@ -191,15 +212,18 @@ public class MainController implements Initializable {
             timeline.stop();
             timeline = null;
         }
-        remainingSeconds = 30 * 60;
-        isPaused = false;
-        updateTimerLabel();
 
-        //调用后端停止记录
         if (currentLog != null) {
             workLogsService.stopLog(currentLog.getId());
             currentLog = null;
         }
+        remainingSeconds = 30 * 60;
+        isPaused = false;
+        updateTimerLabel();
+
+        // ★ 停止后：恢复苹果图和下拉框
+        appleImage.setDisable(false);
+        workTypeComboBox.setDisable(false);
 
         startButton.setDisable(false);
         pauseButton.setDisable(true);
@@ -238,23 +262,22 @@ public class MainController implements Initializable {
     @FXML
     private void onSettingsClick() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/SettingView.fxml"), LocalizationManager.getBundle());
-            Scene settingsScene = new Scene(loader.load());
-
-            /* ★ 把同一个 Service 注入 Setting 控制器 */
-            SettingsController ctrl = loader.getController();
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/view/MainView.fxml")
+            ); // Note: MainView does not need bundle here
+            FXMLLoader settingsLoader = new FXMLLoader(
+                    getClass().getResource("/view/SettingView.fxml"),
+                    LocalizationManager.getBundle()      // ★ pass bundle
+            );
+            Parent settingsPage = settingsLoader.load();
+            SettingsController ctrl = settingsLoader.getController();
             ctrl.setWorkTypeService(workTypeService);
-
-            // 新建一个新的窗口（Stage）
             Stage settingsStage = new Stage();
-            settingsStage.setTitle("设置");
-            settingsStage.setScene(settingsScene);
-            settingsStage.setResizable(false); // 可选：如果想让设置页固定大小
-
-            /* ★ 监听窗口关闭，刷新下拉框 */
-            settingsStage.setOnHidden(e -> refreshWorkTypeComboBox());
-            settingsStage.show(); // 打开！
-
+            settingsStage.setTitle(LocalizationManager.getBundle().getString("settings.title")); // ★ i18n title
+            settingsStage.setScene(new Scene(settingsPage));
+            settingsStage.setResizable(false);
+            settingsStage.setOnHidden(e -> initData());
+            settingsStage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -264,7 +287,7 @@ public class MainController implements Initializable {
     @FXML
     private void onStatisticsClick() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/StatisticsView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/StatisticsView.fxml"),LocalizationManager.getBundle());
             Parent statisticsPage = loader.load();
 
             Stage stage = new Stage();
@@ -280,6 +303,8 @@ public class MainController implements Initializable {
     //点击苹果图片后出现弹窗
     @FXML
     private void onAppleClick() {
+        // ★ 如果倒计时还在（未调用 handleStop），直接返回，不弹面板
+        if (timeline != null) return;
         timePickerPanel.setVisible(true); // 显示选择时间面板
     }
 

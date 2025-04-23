@@ -44,7 +44,7 @@
                     <Label fx:id="timerLabel" text="30:00" style="-fx-font-size: 35px; -fx-text-fill: #333;" translateY="-1"/>
                 </StackPane>
                 <VBox fx:id="eventSelector" spacing="5" alignment="CENTER">
-                    <Label fx:id="eventLabel" text="Present Work" style="-fx-font-size: 18px;"/>
+                    <Label fx:id="eventLabel" text="%main.currentType" style="-fx-font-size: 18px;"/>
                     <ComboBox fx:id="workTypeComboBox" prefWidth="150"/>
                 </VBox>
             </VBox>
@@ -52,11 +52,11 @@
             <!-- 选择时间面板 -->
             <AnchorPane fx:id="timePickerPanel" visible="false" style="-fx-background-color: rgba(0,0,0,0.5)">
                 <VBox alignment="CENTER" spacing="10" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-                    <Label text="Please Choose a Timer" style="-fx-text-fill: white; -fx-font-size: 18px;"/>
+                    <Label fx:id="chooseTimerLabel" text="%main.chooseTimer" style="-fx-text-fill: white; -fx-font-size: 18px;"/>
                     <Spinner fx:id="minuteSpinner" prefWidth="100"/>
                     <HBox spacing="20" alignment="CENTER">
-                        <Button text="Confirm" onAction="#handleConfirmTime"/>
-                        <Button text="Cancel" onAction="#handleCancelTime"/>
+                        <Button fx:id="confirmButton" text="%button.confirm" onAction="#handleConfirmTime"/>
+                        <Button fx:id="cancelButton" text="%button.cancel" onAction="#handleCancelTime"/>
                     </HBox>
                 </VBox>
             </AnchorPane>
@@ -66,9 +66,9 @@
     <!-- 底部按钮区 -->
     <bottom>
         <HBox spacing="15" alignment="CENTER" style="-fx-padding: 20px;">
-            <Button fx:id="startButton" text="Start" onAction="#handleStart"/>
-            <Button fx:id="pauseButton" text="Pause" onAction="#handlePause" disable="true"/>
-            <Button fx:id="stopButton" text="Stop" onAction="#handleStop" disable="true"/>
+            <Button fx:id="startButton" text="%button.start" onAction="#handleStart"/>
+            <Button fx:id="pauseButton" text="%button.pause" onAction="#handlePause" disable="true"/>
+            <Button fx:id="stopButton" text="%button.stop" onAction="#handleStop" disable="true"/>
         </HBox>
     </bottom>
 

@@ -6,18 +6,18 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Orientation;
-import javafx.scene.Node;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import model.WorkLogs;
-import model.WorkType;
 import org.controlsfx.control.CheckListView;
 import repository.WorkLogsRepositoryImpl;
 import repository.WorkTypeRepositoryImpl;
 import service.WorkLogsService;
 import service.WorkTypeService;
+import util.BaseController;
+import util.I18nKey;
+import util.LocalizationManager;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -26,16 +26,18 @@ import java.util.stream.Collectors;
 public class StatisticsController {
 
     /* ---------- FXML ---------- */
-    @FXML private Button  selectDateRangeButton;
+    @FXML @I18nKey("stats.selectDateRange") private Button  selectDateRangeButton;
+    @FXML @I18nKey("stats.filterEvents")
+    private Button openFilterButton;
     @FXML private VBox    dateRangePanel;
     @FXML private DatePicker startDatePicker, endDatePicker;
 
-    @FXML private PieChart pieChart;
+    @FXML @I18nKey("stats.pieChart") private PieChart pieChart;
     @FXML private VBox     recordsContainer;
     @FXML private ScrollPane recordsScrollPane,
             logScrollPane;
     @FXML private VBox logListContainer;
-    @FXML private Label noDataLabel;
+    @FXML @I18nKey("stats.noData") private Label noDataLabel;
     @FXML private SplitPane splitPane;
 
     /* ---------- Service ---------- */
@@ -77,7 +79,11 @@ public class StatisticsController {
     }
 
     /* ========== 日期快捷按钮 ========== */
-    @FXML private void onDateRangeButtonClicked() {  dateRangePanel.setVisible(!dateRangePanel.isVisible()); }
+    @FXML private void onDateRangeButtonClicked() {
+        dateRangePanel.setVisible(!dateRangePanel.isVisible());
+        selectDateRangeButton.setText(
+                LocalizationManager.getBundle().getString("stats.selectDateRange"));
+    }
     @FXML private void onTodayClicked()      { setRange(0); }
     @FXML private void onYesterdayClicked()  { setRange(-1); }
     @FXML private void onLast7DaysClicked()  { setRange(-6); }
@@ -96,7 +102,9 @@ public class StatisticsController {
         LocalDate s = startDatePicker.getValue();
         LocalDate e = endDatePicker.getValue();
         if (s == null || e == null || s.isAfter(e)) {
-            showAlert("请选择正确的时间范围！");
+            showAlert(
+                    LocalizationManager.getBundle().getString("stats.invalidRange")
+            );
             return;
         }
         selectDateRangeButton.setText(s + " 到 " + e);
@@ -109,7 +117,9 @@ public class StatisticsController {
     @FXML private void openWorkTypeSelection() {
 
         Dialog<List<String>> dlg = new Dialog<>();
-        dlg.setTitle("选择要展示的事件");
+        dlg.setTitle(
+                LocalizationManager.getBundle().getString("stats.filterEvents")
+        );
         dlg.getDialogPane().getButtonTypes()
                 .addAll(ButtonType.OK, ButtonType.CANCEL);
 
@@ -180,10 +190,9 @@ public class StatisticsController {
 
         /* ---- Tooltip & Legend 提示 ---- */
         Platform.runLater(() -> {                          // UI 节点已生成
-            for (int i = 0;i < data.size(); i++) {
-                PieChart.Data d = data.get(i);
+            for (PieChart.Data d : data) {
                 Tooltip.install(d.getNode(),
-                        new Tooltip(d.getName()+" : "+format(vToMin(d))));
+                        new Tooltip(d.getName() + " : " + format(vToMin(d))));
             }
         });
 
@@ -202,6 +211,4 @@ public class StatisticsController {
     private static int vToMin(PieChart.Data d){ return (int)d.getPieValue(); }
     private static void showAlert(String m){ new Alert(Alert.AlertType.WARNING,m,ButtonType.OK).showAndWait(); }
 
-    /* 日志视图刷新（若以后再用，可保留） */
-    private void refreshLogList(List<WorkLogs> logs){ /* 原实现省略 */ }
 }

@@ -9,6 +9,7 @@ import repository.WorkTypeRepository;
 import repository.WorkTypeRepositoryImpl;
 import service.WorkLogsService;
 import service.WorkTypeService;
+import util.LocalizationManager;
 
 /**
  * 主程序入口类，继承自 JavaFX 的 Application。
@@ -16,7 +17,7 @@ import service.WorkTypeService;
  */
 public class AppleClockApplication extends Application {
 
-
+    private MainController controller;
     @Override
     public void start(Stage primaryStage) throws Exception {
         // 创建 Repository
@@ -28,7 +29,8 @@ public class AppleClockApplication extends Application {
         WorkLogsService workLogsService = new WorkLogsService(workLogsRepository, workTypeRepository);
 
         // 加载 FXML 布局
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/MainView.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/MainView.fxml"),
+                LocalizationManager.getBundle());
         loader.setControllerFactory(type -> {
             if (type == MainController.class) {
                 MainController c = new MainController();
@@ -43,7 +45,7 @@ public class AppleClockApplication extends Application {
         MainController controller = loader.getController();
 
         // 配置主舞台
-        primaryStage.setTitle("Apple Clock");
+        primaryStage.setTitle(LocalizationManager.getBundle().getString("app.title"));
         primaryStage.setWidth(400);
         primaryStage.setHeight(600);
         primaryStage.setMinWidth(400);
@@ -55,7 +57,15 @@ public class AppleClockApplication extends Application {
         controller.initData();
     }
 
-
+    @Override
+    public void stop() throws Exception {
+        // 当整个应用关闭时，再次确保保存
+        if (controller != null) {
+            controller.handleStop();
+        }
+        super.stop();
+        System.out.println("stopped and saved to file");
+    }
 
     public static void main(String[] args) {
         launch(args); // 启动 JavaFX 应用

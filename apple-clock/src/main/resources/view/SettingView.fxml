@@ -16,27 +16,28 @@
 
     <!-- 新增：用户名 -->
     <VBox spacing="10" style="-fx-padding:10;">
-        <Label text="%settings.username"
+        <Label fx:id="usernameLabel" text="%settings.username"
                style="-fx-font-size:16px;"/>
         <TextField fx:id="usernameField"
                    promptText="%settings.usernamePrompt"
-                   prefWidth="200"/>
+                   prefWidth="200"
+                   focusTraversable="false"/>
     </VBox>
 
     <VBox spacing="10" style="-fx-padding: 10;">
-        <Label text="%settings.theme" style="-fx-font-size: 16px;" />
+        <Label fx:id="themeLabel" text="%settings.theme" style="-fx-font-size: 16px;" />
         <ComboBox fx:id="themeComboBox" prefWidth="200.0" />
     </VBox>
 
     <VBox spacing="10" style="-fx-padding: 10;">
-        <Label text="%settings.language" style="-fx-font-size: 16px;" />
+        <Label fx:id="languageLabel" text="%settings.language" style="-fx-font-size: 16px;" />
         <ComboBox fx:id="languageComboBox" prefWidth="200.0" />
     </VBox>
 
     <Separator />
 
     <VBox spacing="10" style="-fx-padding: 10;">
-        <Label text="%settings.manageWorkType" style="-fx-font-size: 16px;" />
+        <Label fx:id="manageWorkTypeLabel" text="%settings.manageWorkType" style="-fx-font-size: 16px;" />
         <Button fx:id="manageWorkTypeButton" text="%settings.manageWorkTypeButton"
                 onAction="#handleManageWorkTypes" maxWidth="Infinity" style="-fx-alignment: CENTER_LEFT; -fx-font-size: 16px;"
         />

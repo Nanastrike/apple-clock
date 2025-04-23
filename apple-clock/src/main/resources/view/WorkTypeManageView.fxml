@@ -9,11 +9,11 @@
     <top>
         <VBox spacing="10" >
             <HBox alignment="CENTER_LEFT" spacing="10">
-                <Button fx:id="backButton" text="← 返回" onAction="#handleBack"/>
-                <Label text="事件类型管理" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+                <Button fx:id="backButton" text="%button.back" onAction="#handleBack"/>
+                <Label text="%event.title" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
             </HBox>
             <HBox alignment="CENTER_RIGHT" >
-                <Button fx:id="addButton" text="+ 新增" onAction="#onAddClicked"/>
+                <Button fx:id="addButton" text="%event.add" onAction="#onAddClicked"/>
             </HBox>
         </VBox>
     </top>
@@ -29,10 +29,10 @@
     <bottom>
         <VBox spacing="10">
             <HBox fx:id="bottomActionBar"  alignment="CENTER">
-                <Button fx:id="deleteButton" text="删除所选" onAction="#onDeleteClicked"/>
-                <Button fx:id="cancelButton" text="取消选择" onAction="#onCancelClicked"/>
+                <Button fx:id="deleteButton" text="%event.deleteSelected" onAction="#onDeleteClicked"/>
+                <Button fx:id="cancelButton" text="%button.cancel" onAction="#onCancelClicked"/>
             </HBox>
-            <Button fx:id="saveButton" text="保存" onAction="#onSaveClicked" maxWidth="Infinity"/>
+            <Button fx:id="saveButton" text="%settings.save" onAction="#onSaveClicked" maxWidth="Infinity"/>
         </VBox>
     </bottom>
 

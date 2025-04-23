@@ -11,33 +11,39 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.WorkType;
 import service.WorkTypeService;
+import util.BaseController;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
-public class EventManagementController {
+import util.I18nKey;
+import util.LocalizationManager;
+
+public class EventManagementController extends BaseController{
 
     @FXML
     private VBox workTypeList;
-    @FXML
+    @FXML @I18nKey("event.add")
     private Button addButton;
-    @FXML
+    @FXML @I18nKey("event.deleteSelected")
     private Button deleteButton;
-    @FXML
+    @FXML @I18nKey("button.cancel")
     private Button cancelButton;
 
-    @FXML
+    @FXML @I18nKey("button.back")
     private Button backButton;
     @FXML private HBox bottomActionBar;
-    @FXML private Button saveButton;
+    @FXML @I18nKey("button.save")  private Button saveButton;
 
     private final ObservableList<WorkType> workTypes = FXCollections.observableArrayList();
     private final List<Long> selectedIds = new ArrayList<>();
 
     private WorkTypeService workTypeService;
 
-    @FXML
-    private void initialize() {
+    @Override
+    protected void onInitialize(URL location, ResourceBundle resources) {
         // 确保第一页加载时能根据 selectedIds 正确显示
         updateActionButtonsVisibility();
     }
@@ -77,7 +83,7 @@ public class EventManagementController {
         nameField.setLayoutX(50);
         nameField.setLayoutY(10);
         nameField.setPrefWidth(300);
-        nameField.setPromptText("输入名称 (20字符以内)");
+        nameField.setPromptText(LocalizationManager.getBundle().getString("event.namePrompt"));
         nameField.textProperty().addListener((obs, oldText, newText) -> {
             if (newText.length() > 20) {
                 nameField.setText(oldText);
@@ -122,43 +128,33 @@ public class EventManagementController {
     @FXML
     private void onAddClicked() {
         if (workTypes.size() >= 15) {
-            showAlert("最多只能创建15个事件类型！");
+            showAlert(LocalizationManager.getBundle().getString("event.addLimit"));
             return;
         }
-        workTypeService.addType(new WorkType("新事件"));
+        workTypeService.addType(new WorkType(LocalizationManager.getBundle().getString("event.newItem") ));
         refreshList();
     }
 
     @FXML
     private void onSaveClicked() {
-        boolean hasError = false;
-
+        boolean error = false;
         for (var node : workTypeList.getChildren()) {
-            if (node instanceof AnchorPane card
-                    && card.getUserData() instanceof CardData data) {
-
+            if (node instanceof AnchorPane card && card.getUserData() instanceof CardData data) {
                 String newName = data.nameField.getText().trim();
                 if (!newName.isEmpty()) {
-
-                    // ★ 直接用 id + name 调 update
                     WorkType updated = new WorkType();
                     updated.setId(data.id);
                     updated.setName(newName);
-
                     if (workTypeService.update(updated) == null) {
-                        hasError = true;
+                        error = true;
                         break;
                     }
                 }
             }
         }
-
-        if (hasError) {
-            showAlert("保存失败：存在重复的事件名称，请检查后重新保存！");
-        } else {
-            showAlert("保存成功！");
-            refreshList();
-        }
+        String key = error ? "event.saveFail" : "event.saveSuccess";
+        showAlert(LocalizationManager.getBundle().getString(key)); // ★ i18n alert
+        if (!error) refreshList();
     }
 
 
