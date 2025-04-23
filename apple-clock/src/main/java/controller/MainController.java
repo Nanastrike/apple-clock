@@ -19,6 +19,7 @@ import model.WorkType;
 
 import service.WorkLogsService;
 import service.WorkTypeService;
+import util.LocalizationManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -237,7 +238,7 @@ public class MainController implements Initializable {
     @FXML
     private void onSettingsClick() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/SettingView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/SettingView.fxml"), LocalizationManager.getBundle());
             Scene settingsScene = new Scene(loader.load());
 
             /* ★ 把同一个 Service 注入 Setting 控制器 */

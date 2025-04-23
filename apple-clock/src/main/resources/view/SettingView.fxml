@@ -7,33 +7,43 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Separator?>
 
+<?import javafx.scene.control.TextField?>
 <VBox xmlns:fx="http://javafx.com/fxml" spacing="20" alignment="TOP_CENTER"
       prefWidth="400.0" prefHeight="500.0" minWidth="300.0" minHeight="400.0" maxWidth="600.0" maxHeight="700.0"
       fx:controller="controller.SettingsController">
 
-    <Label text="设置" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+    <Label fx:id="titleLabel"  text="%settings.title" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+
+    <!-- 新增：用户名 -->
+    <VBox spacing="10" style="-fx-padding:10;">
+        <Label text="%settings.username"
+               style="-fx-font-size:16px;"/>
+        <TextField fx:id="usernameField"
+                   promptText="%settings.usernamePrompt"
+                   prefWidth="200"/>
+    </VBox>
 
     <VBox spacing="10" style="-fx-padding: 10;">
-        <Label text="主题风格" style="-fx-font-size: 16px;" />
+        <Label text="%settings.theme" style="-fx-font-size: 16px;" />
         <ComboBox fx:id="themeComboBox" prefWidth="200.0" />
     </VBox>
 
     <VBox spacing="10" style="-fx-padding: 10;">
-        <Label text="语言 Language" style="-fx-font-size: 16px;" />
+        <Label text="%settings.language" style="-fx-font-size: 16px;" />
         <ComboBox fx:id="languageComboBox" prefWidth="200.0" />
     </VBox>
 
     <Separator />
 
     <VBox spacing="10" style="-fx-padding: 10;">
-        <Label text="事件类型管理" style="-fx-font-size: 16px;" />
-        <Button fx:id="manageWorkTypeButton" text="管理事件类型" prefWidth="200.0"
+        <Label text="%settings.manageWorkType" style="-fx-font-size: 16px;" />
+        <Button fx:id="manageWorkTypeButton" text="%settings.manageWorkTypeButton"
                 onAction="#handleManageWorkTypes" maxWidth="Infinity" style="-fx-alignment: CENTER_LEFT; -fx-font-size: 16px;"
         />
     </VBox>
 
     <HBox spacing="20" style="-fx-padding: 10;">
-        <Button fx:id="saveButton" text="保存" prefWidth="100.0" onAction="#handleSaveSettings"/>
+        <Button fx:id="saveButton" text="%settings.save" onAction="#handleSaveSettings"/>
     </HBox>
 
 </VBox>
