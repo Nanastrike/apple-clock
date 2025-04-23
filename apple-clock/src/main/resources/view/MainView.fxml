@@ -21,14 +21,15 @@
 <BorderPane xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="controller.MainController"
-            style="-fx-background-color: #fbf3e8;">
+            style="-fx-background-color: #fbf3e8;"
+            fx:id="rootPane">
     <!-- 顶部 -->
     <top>
         <BorderPane>
             <right>
                 <VBox spacing="10" alignment="TOP_RIGHT" style="-fx-padding: 10;">
-                    <Button fx:id="settingButton"  onAction="#onSettingsClick"/>
-                    <Button fx:id="staticsButton"  onAction="#onStatisticsClick"/>
+                    <Button fx:id="settingButton"  onAction="#onSettingsClick" focusTraversable="false"/>
+                    <Button fx:id="staticsButton"  onAction="#onStatisticsClick" focusTraversable="false"/>
                 </VBox>
             </right>
         </BorderPane>

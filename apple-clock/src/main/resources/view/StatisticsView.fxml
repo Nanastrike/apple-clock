@@ -25,16 +25,17 @@
               spacing="10"
               visible="false"
               style="-fx-background-color: #FFFFFF; -fx-border-color: #CCCCCC; -fx-border-radius: 8;">
-        <HBox spacing="10" alignment="CENTER">
-            <DatePicker fx:id="startDatePicker"/>
-            <Label text="%stats.rangeTo"/>
-            <DatePicker fx:id="endDatePicker"/>
-        </HBox>
+
         <HBox spacing="10" alignment="CENTER">
             <Button text="%stats.today"      onAction="#onTodayClicked"/>
             <Button text="%stats.yesterday"      onAction="#onYesterdayClicked"/>
             <Button text="%stats.last7Days"   onAction="#onLast7DaysClicked"/>
             <Button text="%stats.last30Days"  onAction="#onLast30DaysClicked"/>
+        </HBox>
+        <HBox spacing="10" alignment="CENTER">
+            <DatePicker fx:id="startDatePicker"/>
+            <Label text="%stats.rangeTo"/>
+            <DatePicker fx:id="endDatePicker"/>
         </HBox>
             <HBox alignment="CENTER">
                 <Button text="%button.confirm" onAction="#onConfirmDateRange"/>

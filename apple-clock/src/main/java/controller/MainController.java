@@ -2,6 +2,7 @@ package controller;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -11,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import lombok.Setter;
 import model.WorkLogs;
@@ -57,6 +59,8 @@ public class MainController extends BaseController implements Initializable {
     private Button confirmButton;
     @FXML @I18nKey("button.cancel")
     private Button cancelButton;
+    @FXML private BorderPane rootPane;
+
 
     // -------------- 内部变量 --------------
     private Timeline timeline;
@@ -88,6 +92,7 @@ public class MainController extends BaseController implements Initializable {
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 240, 30)
         );
         initData(); // load work types
+        Platform.runLater(() -> rootPane.requestFocus()); //不设置默认focus
     }
 
     private void setupUI() {

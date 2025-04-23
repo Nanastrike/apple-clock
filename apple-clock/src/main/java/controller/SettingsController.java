@@ -1,5 +1,6 @@
 package controller;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
-
+import javafx.scene.layout.VBox;
 import util.BaseController;
 import util.LocalizationManager;
 
@@ -47,6 +48,7 @@ public class SettingsController extends BaseController {
     private Label languageLabel;
     @FXML
     private Button manageWorkTypeButton;
+    @FXML private VBox rootPane; //用于去掉设置界面的focus
     @Setter
     private WorkTypeService workTypeService;
     //    private WorkTypeService workTypeService = new WorkTypeService(new WorkTypeRepositoryImpl());
@@ -121,6 +123,9 @@ public class SettingsController extends BaseController {
             themeComboBox.getSelectionModel().selectFirst();
             languageComboBox.getSelectionModel().selectFirst();
         }
+
+        // ★ 打开界面后，把焦点给「根容器」：
+        Platform.runLater(() -> rootPane.requestFocus());
     }
 
     // 点击保存按钮时
