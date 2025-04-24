@@ -1,0 +1,19 @@
+/* 这会让所有控件都不再画出那圈蓝色 focus-ring */
+* {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+/* kill the focus ring on all PopupControl subclasses (ContextMenu, Tooltip, etc) */
+.popup-control {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+/* restyle the ContextMenu’s border so it matches your panel */
+.popup-control {
+    -fx-background-color: white;
+    -fx-border-color: #CCCCCC;
+    -fx-border-radius: 8;
+    -fx-padding: 10;    /* whatever inset you like */
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 0);
+}

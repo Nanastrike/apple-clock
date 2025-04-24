@@ -42,6 +42,7 @@ public class AppleClockApplication extends Application {
             catch (Exception e) { throw new RuntimeException(e); }
         });
         Scene scene = new Scene(loader.load());
+        scene.getStylesheets().add(getClass().getResource("/css/app.css").toExternalForm());
         MainController controller = loader.getController();
 
         // 配置主舞台

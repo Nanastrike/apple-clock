@@ -99,3 +99,16 @@
     -fx-padding: 4 0 4 4;
 }
 
+/* remove the glowing focus ring globally */
+* {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+/* (Optionally) limit it to just our “date-range” popup */
+.date-range-panel {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+

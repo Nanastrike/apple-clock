@@ -295,7 +295,7 @@ public class MainController extends BaseController implements Initializable {
             Parent statisticsPage = loader.load();
 
             Stage stage = new Stage();
-            stage.setTitle("统计");
+            stage.setTitle(LocalizationManager.getBundle().getString("stats.title"));
             stage.setScene(new Scene(statisticsPage));
             stage.show();
         } catch (IOException e) {
