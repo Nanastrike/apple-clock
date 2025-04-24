@@ -38,3 +38,64 @@
     -fx-min-height: 0;
 }
 
+/* 新增「甜甜圈」样式，让饼图看上去是 Donut */
+.donut-chart {
+    /* 内部留白，JFX11+ 支持这个属性 */
+    -fx-pie-inner-radius: 100;
+}
+
+/* date-button & filter-button 样式 */
+.button.date-button {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #DDDDDD;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 6 12;
+}
+.button.filter-button {
+    -fx-background-color: #EFEFEF;
+    -fx-border-color: transparent;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 6 12;
+}
+
+
+/* 隐藏内置 legend */
+.pie-chart > .chart-legend {
+    -fx-opacity: 0;
+    -fx-min-height: 0;
+    -fx-pref-height: 0;
+}
+
+/* 列表里圆点（代替原 Rectangle） */
+.records-list-circle {
+    -fx-shape: "M1,0 A1,1 0 1,0 -1,0 A1,1 0 1,0 1,0"; /* CSS 圆形路径 */
+    -fx-padding: 0; /* 让它是纯 12×12 */
+}
+
+/* 右侧文本 */
+.records-list-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #333333;
+    -fx-padding: 0 0 0 6;
+}
+/* 卡片背景、圆角、阴影 */
+.records-pane {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 0);
+}
+
+/* 日志行：统一字体、间距 */
+.log-pane .label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #333333;
+}
+
+/* 如果你想给日志行前面加一点缩进，这里也可以： */
+.log-pane .label {
+    -fx-padding: 4 0 4 4;
+}
+

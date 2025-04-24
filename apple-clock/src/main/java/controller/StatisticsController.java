@@ -1,142 +1,135 @@
 package controller;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Paint;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Shape;
 import model.WorkLogs;
 import org.controlsfx.control.CheckListView;
 import repository.WorkLogsRepositoryImpl;
 import repository.WorkTypeRepositoryImpl;
 import service.WorkLogsService;
 import service.WorkTypeService;
-import util.BaseController;
 import util.I18nKey;
 import util.LocalizationManager;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.layout.HBox;
-import javafx.scene.control.Label;
-import javafx.geometry.Pos;
+
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class StatisticsController {
 
-    /* ---------- FXML ---------- */
-    @FXML @I18nKey("stats.selectDateRange") private Button  selectDateRangeButton;
-    @FXML @I18nKey("stats.filterEvents")
+    /* ==== FXML 注入 ==== */
+    @FXML
+    @I18nKey("stats.title")
+    private Label statsTitle;
+    @FXML
+    @I18nKey("stats.selectDateRange")
+    private Button selectDateRangeButton;
+    @FXML
+    @I18nKey("stats.filterEvents")
     private Button openFilterButton;
-    @FXML private VBox    dateRangePanel;
-    @FXML private DatePicker startDatePicker, endDatePicker;
+    @FXML
+    private VBox dateRangePanel;
+    @FXML
+    private DatePicker startDatePicker, endDatePicker;
 
-    @FXML @I18nKey("stats.pieChart") private PieChart pieChart;
-    @FXML private VBox     recordsContainer;
-    @FXML private ScrollPane recordsScrollPane,
-            logScrollPane;
-    @FXML private VBox logListContainer;
-    @FXML @I18nKey("stats.noData") private Label noDataLabel;
-    @FXML private SplitPane splitPane;
+    @FXML
+    private PieChart pieChart;
+    @FXML
+    private ScrollPane recordsScrollPane;
+    @FXML
+    private VBox recordsContainer;
+    @FXML
+    private VBox logListContainer;
+    @FXML
+    @I18nKey("stats.noData")
+    private Label noDataLabel;
+    @FXML
+    private Button toggleViewButton;
 
-    /* ---------- Service ---------- */
+    @FXML private HBox chartPane;
+    @FXML private ScrollPane logPane;
+    private boolean showingLogs = false;
+
+
+    /* ==== 后端服务 ==== */
     private final WorkTypeService workTypeService =
             new WorkTypeService(new WorkTypeRepositoryImpl());
     private final WorkLogsService workLogsService =
             new WorkLogsService(new WorkLogsRepositoryImpl(),
                     new WorkTypeRepositoryImpl());
 
-    /* ---------- 运行时数据 ---------- */
-    private List<String>   workTypeNames;
+    /* ==== 运行时状态 ==== */
+    private List<String> workTypeNames;
     private final List<String> selectedWorkTypes = new ArrayList<>();
 
-    /* ---------- 初始化 ---------- */
+    /** 15 色调色板，和 CSS 里的 default-colorN 对应 */
+    private static final String[] PALETTE = {
+            "#4E79A7", "#F28E2B", "#E15759", "#76B7B2",
+            "#59A14F", "#EDC948", "#B07AA1", "#FF9DA7",
+            "#9C755F", "#BAB0AC", "#6A4C93", "#D33F49",
+            "#FF8C42", "#A1C181", "#50514F"
+    };
+
     @FXML
     private void initialize() {
-
+        // 1) 准备事件类型列表
         workTypeNames = workTypeService.getAllWorkTypeNames();
         selectedWorkTypes.addAll(workTypeNames);
 
-        onLast7DaysClicked();     // 默认时间
-        refreshPieChart();        // 首次刷新
+        // 2) 默认「过去 7 天」
+        setRange(-6);
 
-        // —— 新增：等 Scene 加载完成后，监听宽高比，动态 setOrientation ——
-        splitPane.sceneProperty().addListener((obs, oldScene, scene) -> {
-            if (scene == null) return;
-            ChangeListener<Number> sizeListener = (o, oldV, newV) -> {
-                if (scene.getWidth() > scene.getHeight()) {
-                    splitPane.setOrientation(Orientation.HORIZONTAL);
-                } else {
-                    splitPane.setOrientation(Orientation.VERTICAL);
-                }
-            };
-            scene.widthProperty().addListener(sizeListener);
-            scene.heightProperty().addListener(sizeListener);
-            // 触发一次，初始化 orientation
-            sizeListener.changed(null, null, null);
-        });
+        // 3) 首次刷新
+        onConfirmDateRange();
     }
 
-    /* ========== 日期快捷按钮 ========== */
+    /* —— 日期快捷按钮 —— */
     @FXML private void onDateRangeButtonClicked() {
         dateRangePanel.setVisible(!dateRangePanel.isVisible());
         selectDateRangeButton.setText(
                 LocalizationManager.getBundle().getString("stats.selectDateRange"));
     }
-    @FXML private void onTodayClicked()      { setRange(0); }
-    @FXML private void onYesterdayClicked()  { setRange(-1); }
-    @FXML private void onLast7DaysClicked()  { setRange(-6); }
-    @FXML private void onLast30DaysClicked() { setRange(-29); }
+    @FXML private void onTodayClicked()     { setRange(0);onConfirmDateRange(); }
+    @FXML private void onYesterdayClicked() { setRange(-1);onConfirmDateRange(); }
+    @FXML private void onLast7DaysClicked() { setRange(-6);onConfirmDateRange(); }
+    @FXML private void onLast30DaysClicked(){ setRange(-29);onConfirmDateRange(); }
 
     private void setRange(int offsetDays) {
         LocalDate today = LocalDate.now();
-        startDatePicker.setValue(offsetDays < 0 ? today.plusDays(offsetDays) : today);
+        startDatePicker.setValue(offsetDays<0 ? today.plusDays(offsetDays) : today);
         endDatePicker.setValue(today);
-        onConfirmDateRange();
+        dateRangePanel.setVisible(false);
     }
 
-    /* ========== 日期面板“确定” ========== */
+    /** 点击「确定」后既刷新文字也重绘图表 */
     @FXML private void onConfirmDateRange() {
-
-        LocalDate s = startDatePicker.getValue();
-        LocalDate e = endDatePicker.getValue();
-        if (s == null || e == null || s.isAfter(e)) {
-            showAlert(
-                    LocalizationManager.getBundle().getString("stats.invalidRange")
-            );
+        LocalDate s = startDatePicker.getValue(), e = endDatePicker.getValue();
+        if (s==null || e==null || s.isAfter(e)) {
+            new Alert(Alert.AlertType.WARNING,
+                    LocalizationManager.getBundle().getString("stats.invalidRange"),
+                    ButtonType.OK).showAndWait();
             return;
         }
-        selectDateRangeButton.setText(s + " 到 " + e);
-        dateRangePanel.setVisible(false);
-
+        selectDateRangeButton.setText(s + " － " + e);
         refreshPieChart();
     }
 
-    /* ========== 事件筛选对话框 ========== */
+    /* —— 事件类型筛选 —— */
     @FXML private void openWorkTypeSelection() {
-
         Dialog<List<String>> dlg = new Dialog<>();
-        dlg.setTitle(
-                LocalizationManager.getBundle().getString("stats.filterEvents")
-        );
-        dlg.getDialogPane().getButtonTypes()
-                .addAll(ButtonType.OK, ButtonType.CANCEL);
+        dlg.setTitle(LocalizationManager.getBundle().getString("stats.filterEvents"));
+        dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         CheckListView<String> clv =
                 new CheckListView<>(FXCollections.observableArrayList(workTypeNames));
@@ -144,77 +137,105 @@ public class StatisticsController {
         dlg.getDialogPane().setContent(clv);
 
         dlg.setResultConverter(btn ->
-                btn == ButtonType.OK
+                btn==ButtonType.OK
                         ? new ArrayList<>(clv.getCheckModel().getCheckedItems())
-                        : null);
-
+                        : null
+        );
         dlg.showAndWait().ifPresent(sel -> {
-            // 1. 先清空旧的
             selectedWorkTypes.clear();
-            // 2. 如果全都没勾（sel.isEmpty），就认为要全部类型；否则放入 sel
-            if (sel.isEmpty()) {
-                selectedWorkTypes.addAll(workTypeNames);
-            } else {
-                selectedWorkTypes.addAll(sel);
-            }
+            if (sel.isEmpty()) selectedWorkTypes.addAll(workTypeNames);
+            else             selectedWorkTypes.addAll(sel);
             refreshPieChart();
         });
     }
 
-    /* ---------- 视图切换 ---------- */
-    @FXML private void handleToggleView() {
-        boolean showLogs = !logScrollPane.isVisible();
-        logScrollPane.setVisible(showLogs);
-        recordsScrollPane.setVisible(!showLogs);
-        pieChart.setVisible(!showLogs);
+    /* —— 切换「饼图/日志」视图 —— */
+    @FXML
+    private void handleToggleView() {
+        showingLogs = !showingLogs;
+        chartPane.setVisible(!showingLogs);
+        logPane.setVisible(showingLogs);
+
+        if (showingLogs) {
+            refreshLogView();   // 切到流水时重建列表
+            toggleViewButton.setText(
+                    LocalizationManager.getBundle().getString("stats.showChart"));
+        } else {
+            toggleViewButton.setText(
+                    LocalizationManager.getBundle().getString("stats.toggleView"));
+        }
+    }
+    private void refreshLogView() {
+
+        logListContainer.getChildren().clear();
+        // 1) 查数据，end 加一天
+        List<WorkLogs> raw = workLogsService.findByDateRangeAndWorkNames(
+                startDatePicker.getValue(),
+                endDatePicker.getValue().plusDays(1),
+                selectedWorkTypes
+        );
+
+        // 2) 排序
+        raw.sort((a,b) -> b.getBegin().compareTo(a.getBegin()));
+        // 3) 过滤 & 补全 end==null
+        DateTimeFormatter dmf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        DateTimeFormatter tmf = DateTimeFormatter.ofPattern("HH:mm");
+        for (WorkLogs wl : raw) {
+            LocalDateTime actualEnd = wl.getEnd() != null
+                    ? wl.getEnd()
+                    : wl.getBegin().plusMinutes(wl.getDuration());
+
+            String range = wl.getBegin().format(dmf)
+                    + " ～ " + actualEnd.format(tmf);
+            String line  = range
+                    + "   " + wl.getWorkType().getName()
+                    + "   " + format(wl.getDuration());
+
+            Label row = new Label(line);
+            row.setStyle("-fx-font-size:14px; -fx-text-fill:#333;");
+            logListContainer.getChildren().add(row);
+        }
+
+        if (raw.isEmpty()) {
+            Label empty = new Label(
+                    LocalizationManager.getBundle().getString("stats.noData")
+            );
+            empty.setStyle("-fx-text-fill:gray; -fx-font-size:16px;");
+            logListContainer.getChildren().add(empty);
+        }
     }
 
-    /* ========== 主刷新方法 ========== */
-    // 1. 获取用户选择的时间范围
-    // 2. 获取用户选择的事件类型
-    // 3. 从数据库查询对应的 WorkLogs
-    // 4. 生成数据集
-    // 5. 设置到 PieChart 控件上
-
-    private static final String[] PALETTE = {
-            "#4E79A7", "#F28E2B", "#E15759", "#76B7B2",
-            "#59A14F", "#EDC948", "#B07AA1", "#FF9DA7",
-            "#9C755F", "#BAB0AC", "#6A4C93", "#D33F49",
-            "#FF8C42", "#A1C181", "#50514F"
-    };
+    /* —— 核心：重绘饼图和右侧列表 —— */
     private void refreshPieChart() {
-        // 1) 查询
         List<WorkLogs> logs = workLogsService.findByDateRangeAndWorkNames(
                 startDatePicker.getValue(),
                 endDatePicker.getValue(),
                 selectedWorkTypes
         );
 
-        // 2) 空数据处理
         boolean empty = logs.isEmpty();
         pieChart.setVisible(!empty);
         recordsScrollPane.setVisible(!empty);
-        logScrollPane.setVisible(false);
+        logPane.setVisible(false);
         noDataLabel.setVisible(empty);
         if (empty) return;
 
-        // 3) 汇总
-        Map<String,Integer> total = logs.stream()
-                .collect(Collectors.groupingBy(
-                        l -> l.getWorkType().getName(),
+        // 汇总
+        Map<String,Integer> total = logs.stream().collect(
+                Collectors.groupingBy(
+                        l->l.getWorkType().getName(),
                         LinkedHashMap::new,
                         Collectors.reducing(0, WorkLogs::getDuration, Integer::sum)
-                ));
+                )
+        );
 
-        // 4) 生成饼图数据
+        // 饼图数据
         ObservableList<PieChart.Data> data = FXCollections.observableArrayList();
-        total.forEach((name, minutes) -> data.add(new PieChart.Data(name, minutes)));
+        total.forEach((n,v)-> data.add(new PieChart.Data(n, v)));
         pieChart.setData(data);
-
-        // 5) 去掉内置 Legend
         pieChart.setLegendVisible(false);
 
-        // 6) 注册 Tooltip （可选）
+        // Tooltip
         Platform.runLater(() -> {
             for (PieChart.Data d : data) {
                 Tooltip.install(d.getNode(),
@@ -222,51 +243,32 @@ public class StatisticsController {
             }
         });
 
-        // 7) 在右侧列表生成带色块的行
+        // 右侧列表
         recordsContainer.getChildren().clear();
-        List<PieChart.Data> pieData = pieChart.getData();
         total.entrySet().stream()
                 .sorted(Map.Entry.<String,Integer>comparingByValue().reversed())
                 .forEach(entry -> {
                     String name = entry.getKey();
                     int minutes = entry.getValue();
-
-                    int colorIndex = 0;
-                    for (PieChart.Data d : pieData) {
-                        if (d.getName().equals(name)) {
-                            // 找到这个 Data 对应的 Node
-                            for (String cls : d.getNode().getStyleClass()) {
-                                if (cls.startsWith("default-color")) {
-                                    // cls 形如 "default-color3"
-                                    colorIndex = Integer.parseInt(cls.substring("default-color".length()));
-                                    break;
-                                }
-                            }
-                            break;
-                        }
-                    }
+                    // 找到它在 pieChart 中的 default-colorX
+                    int colorIndex = data.stream()
+                            .filter(d->d.getName().equals(name))
+                            .map(d-> d.getNode().getStyleClass().stream()
+                                    .filter(c->c.startsWith("default-color"))
+                                    .findFirst()
+                                    .map(c->Integer.parseInt(c.substring(13)))
+                                    .orElse(0))
+                            .findFirst().orElse(0);
                     Color fill = Color.web(PALETTE[colorIndex]);
 
-                    // 小色块 + 文本
                     Circle dot = new Circle(6, fill);
                     Label text = new Label(name + " — " + format(minutes));
-                    text.setStyle("-fx-font-size:14px;");
-
                     HBox row = new HBox(8, dot, text);
                     row.setAlignment(Pos.CENTER_LEFT);
                     recordsContainer.getChildren().add(row);
                 });
     }
 
-    // 辅助方法
-    private static String format(int min) {
-        return (min/60>0 ? min/60 + "h" : "") + (min%60) + "m";
-    }
-    private static int vToMin(PieChart.Data d) {
-        return (int)d.getPieValue();
-    }
-    private static void showAlert(String m) {
-        new Alert(Alert.AlertType.WARNING, m, ButtonType.OK).showAndWait();
-    }
-
+    private static String format(int m) { return (m/60>0 ? m/60+"h":"") + (m%60)+"m"; }
+    private static int    vToMin(PieChart.Data d) { return (int)d.getPieValue(); }
 }

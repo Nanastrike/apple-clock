@@ -61,7 +61,6 @@ public class MainController extends BaseController implements Initializable {
     private Button cancelButton;
     @FXML private BorderPane rootPane;
 
-
     // -------------- 内部变量 --------------
     private Timeline timeline;
     private int remainingSeconds = 30 * 60;
