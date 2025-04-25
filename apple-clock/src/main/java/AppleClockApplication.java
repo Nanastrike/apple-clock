@@ -9,6 +9,7 @@ import repository.WorkTypeRepository;
 import repository.WorkTypeRepositoryImpl;
 import service.WorkLogsService;
 import service.WorkTypeService;
+import util.HibernateUtil;
 import util.LocalizationManager;
 
 /**
@@ -20,6 +21,8 @@ public class AppleClockApplication extends Application {
     private MainController controller;
     @Override
     public void start(Stage primaryStage) throws Exception {
+        HibernateUtil.printCurrentDatabaseURL();
+
         // 创建 Repository
         WorkTypeRepository workTypeRepository = new WorkTypeRepositoryImpl();
         WorkLogsRepository workLogsRepository = new WorkLogsRepositoryImpl();

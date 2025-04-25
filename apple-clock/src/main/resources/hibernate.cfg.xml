@@ -5,7 +5,7 @@
 
         <!-- 数据库连接配置 -->
         <property name="hibernate.connection.driver_class">org.h2.Driver</property>
-        <property name="hibernate.connection.url">jdbc:h2:mem:appleclockdb;DB_CLOSE_DELAY=-1</property>
+        <property name="hibernate.connection.url">jdbc:h2:~/AppleClockData/appleclock;AUTO_SERVER=TRUE</property>
         <property name="hibernate.connection.username">sa</property>
         <property name="hibernate.connection.password"></property>
 
