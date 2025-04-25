@@ -1,6 +1,7 @@
 package controller;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -45,18 +46,30 @@ public class StatisticsController {
     @FXML
     private DatePicker startDatePicker, endDatePicker;
 
-    @FXML private PieChart pieChart;
-    @FXML private ScrollPane recordsScrollPane;
-    @FXML private VBox recordsContainer;
-    @FXML private ScrollPane logPane;
-    @FXML private VBox logListContainer;
-    @FXML @I18nKey("stats.noData") private Label noDataLabel;
-    @FXML private Button toggleViewButton;
-    @FXML private HBox chartPane;
-    @FXML private VBox logPaneContainer;
-    @FXML private DialogPane filterDialog;
-    @FXML private CheckListView<String> filterClv;
-
+    @FXML
+    private PieChart pieChart;
+    @FXML
+    private ScrollPane recordsScrollPane;
+    @FXML
+    private VBox recordsContainer;
+    @FXML
+    @I18nKey("stats.noData")
+    private Label noDataLabel;
+    @FXML
+    private Button toggleViewButton;
+    @FXML
+    private HBox chartPane;
+    @FXML
+    private VBox logPaneContainer;
+    @FXML
+    private DialogPane filterDialog;
+    @FXML
+    private CheckListView<String> filterClv;
+    @FXML private TreeTableView<LogEntry> logTable;
+    @FXML private TreeTableColumn<LogEntry, String> dateColumn;
+    @FXML private TreeTableColumn<LogEntry, String> timeColumn;
+    @FXML private TreeTableColumn<LogEntry, String> typeColumn;
+    @FXML private TreeTableColumn<LogEntry, String> durationColumn;
     private boolean showingLogs = false;
 
     /* ==== 后端服务 ==== */
@@ -70,7 +83,9 @@ public class StatisticsController {
     private List<String> workTypeNames;
     private final List<String> selectedWorkTypes = new ArrayList<>();
 
-    /** 15 色调色板，和 CSS 里的 default-colorN 对应 */
+    /**
+     * 15 色调色板，和 CSS 里的 default-colorN 对应
+     */
     private static final String[] PALETTE = {
             "#4E79A7", "#F28E2B", "#E15759", "#76B7B2",
             "#59A14F", "#EDC948", "#B07AA1", "#FF9DA7",
@@ -80,6 +95,19 @@ public class StatisticsController {
 
     @FXML
     private void initialize() {
+        // 设置列的值工厂
+        dateColumn.setCellValueFactory( p ->
+                new SimpleStringProperty(p.getValue().getValue().getDateHeader())
+        );
+        timeColumn.setCellValueFactory( p ->
+                new SimpleStringProperty(p.getValue().getValue().getTimeRange())
+        );
+        typeColumn.setCellValueFactory( p ->
+                new SimpleStringProperty(p.getValue().getValue().getWorkType())
+        );
+        durationColumn.setCellValueFactory( p ->
+                new SimpleStringProperty(p.getValue().getValue().getDurationText())
+        );
         // 1) 准备事件类型列表
         workTypeNames = workTypeService.getAllWorkTypeNames();
         selectedWorkTypes.addAll(workTypeNames);
@@ -106,22 +134,43 @@ public class StatisticsController {
     }
 
     /* —— 快捷按钮 —— */
-    @FXML private void onTodayClicked()     { setRange(0); onConfirmDateRange(); }
-    @FXML private void onYesterdayClicked() { setRange(-1); onConfirmDateRange(); }
-    @FXML private void onLast7DaysClicked() { setRange(-6); onConfirmDateRange(); }
-    @FXML private void onLast30DaysClicked(){ setRange(-29); onConfirmDateRange(); }
+    @FXML
+    private void onTodayClicked() {
+        setRange(0);
+        onConfirmDateRange();
+    }
+
+    @FXML
+    private void onYesterdayClicked() {
+        setRange(-1);
+        onConfirmDateRange();
+    }
+
+    @FXML
+    private void onLast7DaysClicked() {
+        setRange(-6);
+        onConfirmDateRange();
+    }
+
+    @FXML
+    private void onLast30DaysClicked() {
+        setRange(-29);
+        onConfirmDateRange();
+    }
 
     private void setRange(int offsetDays) {
         LocalDate today = LocalDate.now();
-        startDatePicker.setValue(offsetDays<0 ? today.plusDays(offsetDays) : today);
+        startDatePicker.setValue(offsetDays < 0 ? today.plusDays(offsetDays) : today);
         endDatePicker.setValue(today);
     }
 
-    /** 点击确定后刷新并隐藏悬浮面板 */
+    /**
+     * 点击确定后刷新并隐藏悬浮面板
+     */
     @FXML
     private void onConfirmDateRange() {
         LocalDate s = startDatePicker.getValue(), e = endDatePicker.getValue();
-        if (s==null || e==null || s.isAfter(e)) {
+        if (s == null || e == null || s.isAfter(e)) {
             new Alert(Alert.AlertType.WARNING,
                     LocalizationManager.getBundle().getString("stats.invalidRange"),
                     ButtonType.OK).showAndWait();
@@ -129,7 +178,11 @@ public class StatisticsController {
         }
         selectDateRangeButton.setText(s + " － " + e);
         dateContextMenu.hide();           // 隐藏悬浮面板
-        refreshPieChart();
+        if (showingLogs) {
+            refreshLogView();
+        } else {
+            refreshPieChart();
+        }
     }
 
     /* —— 事件类型筛选 —— */
@@ -168,11 +221,11 @@ public class StatisticsController {
         );
         dlg.showAndWait().ifPresent(sel -> {
             selectedWorkTypes.clear();
-            if (sel.isEmpty())      selectedWorkTypes.addAll(workTypeNames);
-            else                    selectedWorkTypes.addAll(sel);
+            if (sel.isEmpty()) selectedWorkTypes.addAll(workTypeNames);
+            else selectedWorkTypes.addAll(sel);
 
-            if (showingLogs)        refreshLogView();
-            else                    refreshPieChart();
+            if (showingLogs) refreshLogView();
+            else refreshPieChart();
         });
     }
 
@@ -194,39 +247,86 @@ public class StatisticsController {
         }
     }
 
-    /** 构建流水视图 */
+    /**
+     * 构建流水视图
+     */
     private void refreshLogView() {
-        logListContainer.getChildren().clear();
+        // 隐藏饼图 & 列表，显示日志表
+        pieChart.setVisible(false);
+        recordsScrollPane.setVisible(false);
+        logTable.setVisible(true);
+        noDataLabel.setVisible(false);
+
+        // 1) 拉出数据并按日期分组
         List<WorkLogs> raw = workLogsService.findByDateRangeAndWorkNames(
                 startDatePicker.getValue(),
                 endDatePicker.getValue(),
                 selectedWorkTypes
         );
-        raw.sort((a,b)->b.getBegin().compareTo(a.getBegin()));
-        DateTimeFormatter dmf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        DateTimeFormatter tmf = DateTimeFormatter.ofPattern("HH:mm");
+        Map<LocalDate, List<WorkLogs>> grouped = raw.stream()
+                .collect(Collectors.groupingBy(
+                        wl -> wl.getBegin().toLocalDate(),
+                        LinkedHashMap::new,
+                        Collectors.toList()
+                ));
 
-        for (WorkLogs wl : raw) {
-            LocalDateTime end = wl.getEnd()!=null
-                    ? wl.getEnd()
-                    : wl.getBegin().plusMinutes(wl.getDuration());
-            String range = wl.getBegin().format(dmf) + " ～ " + end.format(tmf);
-            String line = range + "   " + wl.getWorkType().getName()
-                    + "   " + format(wl.getDuration());
-            Label row = new Label(line);
-            row.setStyle("-fx-font-size:14px; -fx-text-fill:#333;");
-            logListContainer.getChildren().add(row);
-        }
-        if (raw.isEmpty()) {
-            Label empty = new Label(
-                    LocalizationManager.getBundle().getString("stats.noData")
-            );
-            empty.setStyle("-fx-text-fill:gray; -fx-font-size:16px;");
-            logListContainer.getChildren().add(empty);
-        }
+        // 2) 构造树状节点
+        TreeItem<LogEntry> root = new TreeItem<>(new LogEntry());
+        root.setExpanded(true);
+
+        DateTimeFormatter tmf = DateTimeFormatter.ofPattern("HH:mm");
+        DateTimeFormatter dTitle = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.getDefault());
+
+        grouped.forEach((date, list) -> {
+            String header = date.format(dTitle);
+            TreeItem<LogEntry> dateNode = new TreeItem<>(LogEntry.dateHeader(header));
+            dateNode.setExpanded(true);
+
+            for (WorkLogs wl : list) {
+                LocalDateTime end = wl.getEnd()!=null
+                        ? wl.getEnd()
+                        : wl.getBegin().plusMinutes(wl.getDuration());
+                String range = wl.getBegin().format(tmf) + " – " + end.format(tmf);
+                String dur   = format(wl.getDuration());
+                TreeItem<LogEntry> row = new TreeItem<>(LogEntry.logRow(range, wl.getWorkType().getName(), dur));
+                dateNode.getChildren().add(row);
+            }
+            root.getChildren().add(dateNode);
+        });
+
+        // 3) 应用到 Table
+        logTable.setRoot(root);
+        logTable.refresh();
     }
 
-    /** 构建饼图和列表 */
+    public static class LogEntry {
+        private final String dateHeader, timeRange, workType, durationText;
+        // 构造通用行
+        private LogEntry(String dateHeader, String timeRange, String workType, String durationText) {
+            this.dateHeader = dateHeader;
+            this.timeRange = timeRange;
+            this.workType = workType;
+            this.durationText = durationText;
+        }
+        // 用于根节点
+        public LogEntry() { this("", "", "", ""); }
+        // 一级节点工厂
+        public static LogEntry dateHeader(String dateTitle) {
+            return new LogEntry(dateTitle, "", "", "");
+        }
+        // 二级日志行工厂
+        public static LogEntry logRow(String timeRange, String workType, String duration) {
+            return new LogEntry("", timeRange, workType, duration);
+        }
+        public String getDateHeader()  { return dateHeader; }
+        public String getTimeRange()   { return timeRange; }
+        public String getWorkType()    { return workType; }
+        public String getDurationText(){ return durationText; }
+    }
+
+    /**
+     * 构建饼图和列表
+     */
     private void refreshPieChart() {
         List<WorkLogs> logs = workLogsService.findByDateRangeAndWorkNames(
                 startDatePicker.getValue(),
@@ -236,50 +336,52 @@ public class StatisticsController {
         boolean empty = logs.isEmpty();
         pieChart.setVisible(!empty);
         recordsScrollPane.setVisible(!empty);
-        logPane.setVisible(false);
+        logPaneContainer.setVisible(false);
         noDataLabel.setVisible(empty);
         if (empty) return;
 
-        Map<String,Integer> total = logs.stream().collect(
+        Map<String, Integer> total = logs.stream().collect(
                 Collectors.groupingBy(
-                        l->l.getWorkType().getName(),
+                        l -> l.getWorkType().getName(),
                         LinkedHashMap::new,
                         Collectors.reducing(0, WorkLogs::getDuration, Integer::sum)
                 )
         );
 
         ObservableList<PieChart.Data> data = FXCollections.observableArrayList();
-        total.forEach((n,v)->data.add(new PieChart.Data(n,v)));
+        total.forEach((n, v) -> data.add(new PieChart.Data(n, v)));
         pieChart.setData(data);
         pieChart.setLegendVisible(false);
 
         Platform.runLater(() -> {
             for (PieChart.Data d : data) {
                 Tooltip.install(d.getNode(),
-                        new Tooltip(d.getName()+" : "+format((int)d.getPieValue())));
+                        new Tooltip(d.getName() + " : " + format((int) d.getPieValue())));
             }
         });
 
         recordsContainer.getChildren().clear();
         total.entrySet().stream()
-                .sorted(Map.Entry.<String,Integer>comparingByValue().reversed())
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
                 .forEach(entry -> {
                     int idx = data.stream()
-                            .filter(d->d.getName().equals(entry.getKey()))
-                            .map(d->d.getNode().getStyleClass().stream()
-                                    .filter(c->c.startsWith("default-color"))
+                            .filter(d -> d.getName().equals(entry.getKey()))
+                            .map(d -> d.getNode().getStyleClass().stream()
+                                    .filter(c -> c.startsWith("default-color"))
                                     .findFirst()
-                                    .map(c->Integer.parseInt(c.substring(13)))
+                                    .map(c -> Integer.parseInt(c.substring(13)))
                                     .orElse(0))
                             .findFirst().orElse(0);
                     Color fill = Color.web(PALETTE[idx]);
                     Circle dot = new Circle(6, fill);
-                    Label text = new Label(entry.getKey()+" — "+format(entry.getValue()));
+                    Label text = new Label(entry.getKey() + " — " + format(entry.getValue()));
                     HBox row = new HBox(8, dot, text);
                     row.setAlignment(Pos.CENTER_LEFT);
                     recordsContainer.getChildren().add(row);
                 });
     }
 
-    private static String format(int m) { return (m/60>0?m/60+"h":"")+(m%60)+"m"; }
+    private static String format(int m) {
+        return (m / 60 > 0 ? m / 60 + "h" : "") + (m % 60) + "m";
+    }
 }

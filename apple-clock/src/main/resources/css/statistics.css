@@ -92,9 +92,81 @@
 .records-pane {
     -fx-background-color: white;
     -fx-background-radius: 8;
-    -fx-padding: 20;
+    -fx-border-color: transparent;
     -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 0);
+    -fx-padding: 12;
 }
+/* Remove the default gradient from the column-header background */
+.records-pane .column-header-background {
+    -fx-background-color: white;
+    -fx-border-color: transparent;
+    -fx-background-radius: 8 8 0 0;  /* round top corners */
+}
+/* Flatten each header cell */
+.records-pane .column-header,
+.records-pane .column-header .label {
+    -fx-border-color: transparent;
+    -fx-padding: 6 8;
+    -fx-font-weight: bold;
+}
+
+/* Remove row borders, add a little padding */
+.records-pane .table-row-cell {
+    -fx-border-color: transparent;
+    -fx-padding: 4 8;
+}
+
+/* Style the vertical scrollbar to be subtle and rounded */
+.records-pane .scroll-bar:vertical {
+    -fx-pref-width: 8;
+    -fx-background-color: transparent;
+}
+.records-pane .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+}
+.records-pane .scroll-bar:vertical .thumb {
+    -fx-background-color: rgba(0,0,0,0.1);
+    -fx-background-radius: 4;
+    -fx-padding: 2;
+}
+
+/* Likewise for horizontal, if you ever enable it */
+.records-pane .scroll-bar:horizontal {
+    -fx-pref-height: 8;
+    -fx-background-color: transparent;
+}
+.records-pane .scroll-bar:horizontal .track {
+    -fx-background-color: transparent;
+}
+.records-pane .scroll-bar:horizontal .thumb {
+    -fx-background-color: rgba(0,0,0,0.1);
+    -fx-background-radius: 4;
+    -fx-padding: 2;
+}
+/* 1) Base header background for TreeTableView */
+.tree-table-view .column-header-background {
+    -fx-background-color: white;
+}
+
+/* 2) Flatten each real header cell, with a 1px right border */
+.tree-table-view .column-header {
+    -fx-background-color: white;
+    -fx-border-color: #DDD;
+    -fx-border-width: 0 1 0 0;   /* top/right/bottom/left */
+}
+.tree-table-view .column-header .label {
+    -fx-padding: 6 8;            /* adjust to taste */
+}
+
+/* 3) Hide the trailing “spacer” / corner-button so you don’t get that extra empty cell */
+.tree-table-view .column-header-background > .empty-column-header,
+.tree-table-view .column-header-background > .corner-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+
+
 
 /* 日志行：统一字体、间距 */
 .log-pane .label {
@@ -150,7 +222,7 @@
 }
 
 /* ScrollPane 让日志区域竖向拉伸 */
-.log-pane-scroll {                                          /* MODIFIED: 让这个 ScrollPane 在 VBox 中撑满 */
+.log-pane-scroll {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
 }
@@ -162,6 +234,9 @@
     -fx-padding: 16;                                                /* 四边统一内边距 */
     -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 0);  /* 阴影 */
 }
-
-/* 如果你还想调整里面按钮的样式，可以复用 .button.date-button */
-
+/* 列表区域通用滚动面板 */
+.records-scroll {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}

@@ -9,7 +9,7 @@
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="controller.StatisticsController"
-            prefWidth="800" prefHeight="600"
+            prefWidth="700" prefHeight="500"
             stylesheets="@/css/statistics.css">
     <fx:define>
 
@@ -94,13 +94,11 @@
     <!-- 中心内容区：饼图 & 统计列表 & 日志 -->
     <center>
         <StackPane>
-
-            <!-- —— 饼图 + 统计列表 —— -->
+            <!-- 饼图 + 统计列表 -->
             <HBox fx:id="chartPane"
                   spacing="20"
                   alignment="CENTER"
                   style="-fx-padding:20 30;">
-                <!-- 饼图区 -->
                 <StackPane prefWidth="400" prefHeight="400">
                     <PieChart fx:id="pieChart"
                               styleClass="donut-chart"
@@ -112,7 +110,6 @@
                            visible="false"
                            alignment="CENTER"/>
                 </StackPane>
-
                 <!-- 统计列表 -->
                 <ScrollPane fx:id="recordsScrollPane"
                             fitToWidth="true"
@@ -120,48 +117,53 @@
                             prefWidth="200" maxHeight="400"
                             style="-fx-background-color:transparent; -fx-border-color:transparent;">
 
-                        <VBox fx:id="recordsContainer"
-                              spacing="12"
-                              style="-fx-background-color:transparent;
+                    <VBox fx:id="recordsContainer"
+                          spacing="12"
+                          style="-fx-background-color:transparent;
                                  -fx-background-radius:8;
                                  -fx-padding:20;
                                  -fx-effect:dropshadow(one-pass-box,
                                    rgba(0,0,0,0.05),10,0,0,0);"
-                              prefWidth="200"
-                              alignment="CENTER"
-                        />
+                          prefWidth="200"
+                          alignment="CENTER"
+                    />
                 </ScrollPane>
+
             </HBox>
 
-            <!-- —— 日志视图 —— -->
+            <!-- 日志视图：TreeTableView 版 -->
             <VBox fx:id="logPaneContainer"
                   visible="false"
                   spacing="10"
                   styleClass="log-pane-container"
-                  StackPane.alignment="CENTER_RIGHT">
-
-                <!-- 按天分组的标题 -->
-                <Label text="%stats.log"
-                       styleClass="log-group-header"/>
-
-                <!-- 日志滚动区 -->
-                <ScrollPane fx:id="logPane"
-                            fitToWidth="true"
-                            prefWidth="400" prefHeight="400"
-                            style="-fx-background-color:transparent; -fx-border-color:transparent;"
-                >
-                    <VBox fx:id="logListContainer"
-                          spacing="8"
-                          style="-fx-background-color:white;
-                                 -fx-background-radius:8;
-                                 -fx-padding:20;
-                                 -fx-effect:dropshadow(one-pass-box,
-                                   rgba(0,0,0,0.05),10,0,0,0);"
-                          prefWidth="400"/>
-                </ScrollPane>
+                  StackPane.alignment="CENTER">
+                <TreeTableView fx:id="logTable" prefWidth="700"
+                               prefHeight="500"
+                               showRoot="false"
+                               styleClass="records-pane"
+                               tableMenuButtonVisible="false">
+                    <columns>
+                        <TreeTableColumn fx:id="dateColumn"
+                                         text="%stats.date"
+                                         prefWidth="120"/>
+                        <TreeTableColumn fx:id="timeColumn"
+                                         text="%stats.time"
+                                         prefWidth="120"/>
+                        <TreeTableColumn fx:id="typeColumn"
+                                         text="%stats.workType"
+                                         prefWidth="120"/>
+                        <TreeTableColumn fx:id="durationColumn"
+                                         text="%stats.duration"
+                                         prefWidth="120"
+                                         style="-fx-alignment:CENTER-RIGHT;"/>
+                    </columns>
+                    <columnResizePolicy>
+                        <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                    </columnResizePolicy>
+                </TreeTableView>
             </VBox>
-
         </StackPane>
     </center>
+
 
 </BorderPane>
