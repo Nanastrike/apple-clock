@@ -3,37 +3,61 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.EventManagementController">
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.EventManagementController"
+            stylesheets="@/css/event-management.css"
+            styleClass="event-management-pane"
+>
 
     <!-- 顶部标题栏 -->
     <top>
-        <VBox spacing="10" >
-            <HBox alignment="CENTER_LEFT" spacing="10" fx:id="headerBar" styleClass="header-bar">
-                <Button fx:id="backButton" text="%button.back" onAction="#handleBack"/>
-                <Label text="%event.title" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
-            </HBox>
-            <HBox alignment="CENTER_RIGHT">
-                <Button fx:id="addButton" text="%event.add" onAction="#onAddClicked"/>
-            </HBox>
-        </VBox>
+        <HBox fx:id="headerBar"
+              alignment="CENTER_LEFT"
+              spacing="16"
+              styleClass="header-bar">
+            <Label text="%event.title" styleClass="view-title"/>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <Button fx:id="addButton"
+                    text="%event.add"
+                    onAction="#onAddClicked"
+                    styleClass="button primary-button"/>
+        </HBox>
     </top>
 
     <!-- 中间内容区域 -->
     <center>
-        <VBox fx:id="workTypeList" spacing="10">
-            <!-- 动态添加事件卡片 -->
-        </VBox>
+        <ScrollPane fx:id="listScroll"
+                    fitToWidth="true"
+                    styleClass="list-scroll">
+            <content>
+            <VBox fx:id="workTypeList"
+                  spacing="10"
+                  >
+                <!-- 动态添加的每条记录要在 Controller 里 setStyleClass("card") -->
+            </VBox>
+            </content>
+        </ScrollPane>
     </center>
 
     <!-- 底部操作栏（动态出现） -->
     <bottom>
-        <VBox spacing="10">
-            <HBox fx:id="bottomActionBar" alignment="CENTER">
-                <Button fx:id="deleteButton" text="%event.deleteSelected" onAction="#onDeleteClicked"/>
-                <Button fx:id="cancelButton" text="%button.cancel" onAction="#onCancelClicked"/>
-            </HBox>
-            <Button fx:id="saveButton" text="%settings.save" onAction="#onSaveClicked" maxWidth="Infinity"/>
-        </VBox>
+        <HBox fx:id="bottomActionBar" spacing="10" alignment="CENTER_RIGHT"
+              styleClass="bottom-bar">
+            <Button fx:id="deleteButton"
+                    text="%event.deleteSelected"
+                    onAction="#onDeleteClicked"
+                    styleClass="button danger-button"/>
+            <Button fx:id="cancelButton"
+                    text="%button.cancel"
+                    onAction="#onCancelClicked"
+                    styleClass="button danger-button"/>
+
+            <!-- ★ “保存”用主按钮，并撑满 -->
+            <Button fx:id="saveButton"
+                    text="%settings.save"
+                    onAction="#onSaveClicked"
+                    maxWidth="Infinity"
+                    styleClass="button primary-button"/>
+        </HBox>
     </bottom>
 
 </BorderPane>

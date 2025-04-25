@@ -155,7 +155,7 @@
                         <TreeTableColumn fx:id="durationColumn"
                                          text="%stats.duration"
                                          prefWidth="120"
-                                         style="-fx-alignment:CENTER-RIGHT;"/>
+                                         style="-fx-alignment:CENTER-LEFT;"/>
                     </columns>
                     <columnResizePolicy>
                         <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>

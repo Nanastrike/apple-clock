@@ -12,6 +12,10 @@ import javafx.stage.Stage;
 import model.WorkType;
 import service.WorkTypeService;
 import util.BaseController;
+import javafx.application.Platform;
+import javafx.scene.Node;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -21,21 +25,25 @@ import java.util.ResourceBundle;
 import util.I18nKey;
 import util.LocalizationManager;
 
-public class EventManagementController extends BaseController{
+public class EventManagementController extends BaseController {
 
     @FXML
     private VBox workTypeList;
-    @FXML @I18nKey("event.add")
+    @FXML
+    @I18nKey("event.add")
     private Button addButton;
-    @FXML @I18nKey("event.deleteSelected")
+    @FXML
+    @I18nKey("event.deleteSelected")
     private Button deleteButton;
-    @FXML @I18nKey("button.cancel")
+    @FXML
+    @I18nKey("button.cancel")
     private Button cancelButton;
-
-    @FXML @I18nKey("button.back")
-    private Button backButton;
-    @FXML private HBox bottomActionBar;
-    @FXML @I18nKey("button.save")  private Button saveButton;
+    @FXML private ScrollPane listScroll;
+    @FXML
+    private HBox bottomActionBar;
+    @FXML
+    @I18nKey("settings.save")
+    private Button saveButton;
 
     private final ObservableList<WorkType> workTypes = FXCollections.observableArrayList();
     private final List<Long> selectedIds = new ArrayList<>();
@@ -45,6 +53,8 @@ public class EventManagementController extends BaseController{
     @Override
     protected void onInitialize(URL location, ResourceBundle resources) {
         // 确保第一页加载时能根据 selectedIds 正确显示
+        bottomActionBar.setVisible(true);
+        bottomActionBar.setManaged(true);
         updateActionButtonsVisibility();
     }
 
@@ -108,17 +118,19 @@ public class EventManagementController extends BaseController{
     private void updateActionButtonsVisibility() {
         boolean hasSelection = !selectedIds.isEmpty();
 
-        // 原来只切子按钮
+        // 「删除」按钮只有在选中了才显示，不选中就隐藏
         deleteButton.setVisible(hasSelection);
+        deleteButton.setManaged(hasSelection);
         cancelButton.setVisible(hasSelection);
-
-        // 现在让整条底部横条出现／消失
-        bottomActionBar.setVisible(hasSelection);
-        bottomActionBar.setManaged(hasSelection);
+        cancelButton.setManaged(hasSelection);
 
         // 没选中时，只显示「保存」；选中时隐藏「保存」
         saveButton.setVisible(!hasSelection);
         saveButton.setManaged(!hasSelection);
+
+
+        // 「保存」按钮只有在没有选中时才显示，选中了就隐藏
+
     }
 
     private void checkAddButtonStatus() {
@@ -131,9 +143,36 @@ public class EventManagementController extends BaseController{
             showAlert(LocalizationManager.getBundle().getString("event.addLimit"));
             return;
         }
-        workTypeService.addType(new WorkType(LocalizationManager.getBundle().getString("event.newItem") ));
-        refreshList();
+        // 1) 后端新增一条，拿到新对象
+        WorkType newType = workTypeService.addType(
+                new WorkType(LocalizationManager.getBundle().getString("event.newItem"))
+        );
+
+        // 2) 根据它单独生成一个 card，并 append
+        AnchorPane newCard = createTypeCard(newType);
+        workTypeList.getChildren().add(newCard);
+        checkAddButtonStatus();
+        updateActionButtonsVisibility();
+
+        // 3) 确保滚动条滚到底
+        listScroll.setVvalue(1.0);
+
+        // 4) 把焦点丢给新 card 里的 TextField
+        Platform.runLater(() -> {
+            listScroll.setVvalue(1.0);
+
+            // 最后把焦点给新行的 TextField
+            var children = workTypeList.getChildren();
+            AnchorPane lastCard = (AnchorPane) children.get(children.size() - 1);
+            for (Node n : lastCard.getChildren()) {
+                if (n instanceof TextField tf) {
+                    tf.requestFocus();
+                    break;
+                }
+            }
+        });
     }
+
 
     @FXML
     private void onSaveClicked() {
@@ -173,9 +212,10 @@ public class EventManagementController extends BaseController{
         refreshList();
     }
 
+
     private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("提示");
+        alert.setTitle(LocalizationManager.getBundle().getString("alert.title"));
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
@@ -190,11 +230,7 @@ public class EventManagementController extends BaseController{
             this.nameField = nameField;
         }
     }
-    @FXML
-    private void handleBack() {
-        Stage stage = (Stage) backButton.getScene().getWindow();
-        stage.close();
-    }
+
 
 
 }
