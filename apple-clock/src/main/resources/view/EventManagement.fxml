@@ -8,11 +8,11 @@
     <!-- 顶部标题栏 -->
     <top>
         <VBox spacing="10" >
-            <HBox alignment="CENTER_LEFT" spacing="10">
+            <HBox alignment="CENTER_LEFT" spacing="10" fx:id="headerBar" styleClass="header-bar">
                 <Button fx:id="backButton" text="%button.back" onAction="#handleBack"/>
                 <Label text="%event.title" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
             </HBox>
-            <HBox alignment="CENTER_RIGHT" >
+            <HBox alignment="CENTER_RIGHT">
                 <Button fx:id="addButton" text="%event.add" onAction="#onAddClicked"/>
             </HBox>
         </VBox>
@@ -28,7 +28,7 @@
     <!-- 底部操作栏（动态出现） -->
     <bottom>
         <VBox spacing="10">
-            <HBox fx:id="bottomActionBar"  alignment="CENTER">
+            <HBox fx:id="bottomActionBar" alignment="CENTER">
                 <Button fx:id="deleteButton" text="%event.deleteSelected" onAction="#onDeleteClicked"/>
                 <Button fx:id="cancelButton" text="%button.cancel" onAction="#onCancelClicked"/>
             </HBox>

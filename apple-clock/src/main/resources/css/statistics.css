@@ -53,12 +53,20 @@
     -fx-padding: 6 12;
 }
 .button.filter-button {
-    -fx-background-color: #EFEFEF;
+    -fx-background-color: #e6e4e1;
     -fx-border-color: transparent;
     -fx-border-radius: 6;
     -fx-background-radius: 6;
     -fx-padding: 6 12;
 }
+
+ .button.toggle-button {
+     -fx-background-color: #e6e4e1;
+     -fx-border-color: transparent;
+     -fx-border-radius: 6;
+     -fx-background-radius: 6;
+     -fx-padding: 6 12;
+ }
 
 
 /* 隐藏内置 legend */
@@ -109,6 +117,40 @@
 .date-range-panel {
     -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
+    -fx-background-color: #FFF9E0;   /* 淡淡的奶油黄 */
+    -fx-border-color: #CCC;
+    -fx-border-radius: 8;
+    -fx-padding: 10;
+}
+.my-list-pane {
+    -fx-padding: 14 17 12 17; /* top right bottom left */
 }
 
+/* ============ 新增：日志视图卡片 & 分组标题 ============ */
+.log-pane-container {                                       /* MODIFIED: 外层容器，加上圆角+阴影等卡片样式 */
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 0);
+}
 
+/* 按天分组的标题 */
+.log-group-header {                                         /* MODIFIED: 每天开头的分组标题 */
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+    -fx-padding: 8 0 4 0;
+}
+
+/* 具体的日志行 */
+.log-pane .label {                                          /* reuse 原先的 .log-pane .label */
+    -fx-font-size: 14px;
+    -fx-text-fill: #333333;
+    -fx-padding: 4 0 4 0;
+}
+
+/* ScrollPane 让日志区域竖向拉伸 */
+.log-pane-scroll {                                          /* MODIFIED: 让这个 ScrollPane 在 VBox 中撑满 */
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}

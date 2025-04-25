@@ -157,7 +157,7 @@ public class SettingsController extends BaseController {
     @FXML
     private void handleManageWorkTypes() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/WorkTypeManageView.fxml"),
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/EventManagement.fxml"),
                     LocalizationManager.getBundle() );
             Parent managePage = loader.load();
 

@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.chart.PieChart;
@@ -52,6 +53,9 @@ public class StatisticsController {
     @FXML @I18nKey("stats.noData") private Label noDataLabel;
     @FXML private Button toggleViewButton;
     @FXML private HBox chartPane;
+    @FXML private VBox logPaneContainer;
+    @FXML private DialogPane filterDialog;
+    @FXML private CheckListView<String> filterClv;
 
     private boolean showingLogs = false;
 
@@ -131,47 +135,62 @@ public class StatisticsController {
     /* —— 事件类型筛选 —— */
     @FXML
     private void openWorkTypeSelection() {
+        // —— 1) 原有：创建对话框 & 标题 ——
         Dialog<List<String>> dlg = new Dialog<>();
         dlg.setTitle(LocalizationManager.getBundle().getString("stats.filterEvents"));
+
+        // —— 2) 原有：添加按钮 ——
         dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
+        // —— 3) 原有：生成 CheckListView 并打钩 ——
         CheckListView<String> clv = new CheckListView<>(
                 FXCollections.observableArrayList(workTypeNames)
         );
         selectedWorkTypes.forEach(clv.getCheckModel()::check);
-        dlg.getDialogPane().setContent(clv);
 
+        // —— 4) **新增 UI**：复用 CSS 做“卡片”样式 ——
+        DialogPane pane = dlg.getDialogPane();
+        pane.getStylesheets().add(
+                getClass().getResource("/css/statistics.css").toExternalForm()
+        );
+        pane.getStyleClass().add("my-list-pane");
+        // —— 5) **新增 UI**：为了给内容加 padding，我们把 clv 包在一个 VBox 里 ——
+        VBox wrapper = new VBox(clv);
+        wrapper.setSpacing(12);
+        wrapper.setPadding(new Insets(20));  // 四边 20 的统一内边距
+        pane.setContent(wrapper);
+
+        // —— 6) 原有：结果转换 & 显示 ——
         dlg.setResultConverter(btn ->
-                btn==ButtonType.OK
+                btn == ButtonType.OK
                         ? new ArrayList<>(clv.getCheckModel().getCheckedItems())
                         : null
         );
         dlg.showAndWait().ifPresent(sel -> {
             selectedWorkTypes.clear();
-            if (sel.isEmpty()) selectedWorkTypes.addAll(workTypeNames);
-            else               selectedWorkTypes.addAll(sel);
-            // 刷新当前视图
-            if (showingLogs) refreshLogView();
-            else            refreshPieChart();
+            if (sel.isEmpty())      selectedWorkTypes.addAll(workTypeNames);
+            else                    selectedWorkTypes.addAll(sel);
+
+            if (showingLogs)        refreshLogView();
+            else                    refreshPieChart();
         });
     }
+
 
     /* —— 切换「饼图/日志」视图 —— */
     @FXML
     private void handleToggleView() {
         showingLogs = !showingLogs;
         chartPane.setVisible(!showingLogs);
-        logPane.setVisible(showingLogs);
+        logPaneContainer.setVisible(showingLogs);  // MODIFIED: 切换到新容器
+        toggleViewButton.setText(showingLogs
+                ? LocalizationManager.getBundle().getString("stats.showChart")
+                : LocalizationManager.getBundle().getString("stats.toggleView"));
 
         if (showingLogs) {
             refreshLogView();
-            toggleViewButton.setText(
-                    LocalizationManager.getBundle().getString("stats.showChart")
-            );
         } else {
-            toggleViewButton.setText(
-                    LocalizationManager.getBundle().getString("stats.toggleView")
-            );
+            refreshPieChart();
         }
     }
 

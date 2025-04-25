@@ -5,15 +5,15 @@
     -fx-background-color: #f5f5f5;
 }
 
-/* 顶部标题栏 */
-.vbox > .hbox:first-child {
+.header-bar {
     -fx-background-color: white;
     -fx-padding: 12 20;
     -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.1), 5,0,0,2);
 }
-.vbox > .hbox:first-child .label {
+.header-bar .label {
     -fx-text-fill: #333;
 }
+
 
 /* 按钮统一扁平圆角风格 */
 .button {
