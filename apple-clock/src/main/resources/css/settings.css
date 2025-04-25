@@ -1,0 +1,64 @@
+/* settings.css */
+
+/* ====== 根容器: 白底卡片风格 ====== */
+.settings-pane {
+    -fx-background-color: #F5F5F5;
+    -fx-background-radius: 8;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);
+}
+
+/* ====== 标题 ====== */
+.settings-pane .label#titleLabel {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+/* ====== 各节标题 ====== */
+.settings-pane .label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #444444;
+}
+
+/* ====== 输入框 & 下拉框 ====== */
+.settings-pane TextField,
+.settings-pane ComboBox {
+    -fx-background-color: #F7F7F7;
+    -fx-border-color: #CCCCCC;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 6 8;
+}
+
+/* ====== 按钮（通用） ====== */
+.settings-pane .button {
+    -fx-background-color: #E6E4E1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 6 12;
+    -fx-font-size: 14px;
+}
+.settings-pane .button:hover {
+    -fx-background-color: derive(#E6E4E1, -10%);
+}
+.settings-pane .button:pressed {
+    -fx-background-color: derive(#E6E4E1, -20%);
+}
+
+/* ====== Save 按钮: 主要操作样式 ====== */
+.settings-pane #saveButton {
+    -fx-background-color: #e6e4e1;
+    -fx-text-fill: #333333;
+}
+
+/* ====== 分隔线 ====== */
+.settings-pane Separator {
+    -fx-padding: 10 0;
+}
+
+/* ====== Manage 按钮: 左对齐、全宽 ====== */
+.settings-pane #manageWorkTypeButton {
+    -fx-max-width: Infinity;
+    -fx-alignment: center-left;
+}

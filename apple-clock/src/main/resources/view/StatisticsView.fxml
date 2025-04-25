@@ -51,11 +51,7 @@
                                         <VBox
                                                 fx:id="dateRangePanel"
                                                 styleClass="date-range-panel"
-                                                spacing="10"
-                                                style="-fx-background-color:#FFF;
-                                                     -fx-border-color:#CCC;
-                                                     -fx-border-radius:8;
-                                                     -fx-padding:10;">
+                                                spacing="10">
                                             <!-- 快捷日期按钮 -->
                                             <HBox spacing="10" alignment="CENTER">
                                                 <Button text="%stats.today" onAction="#onTodayClicked"/>

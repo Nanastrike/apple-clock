@@ -154,3 +154,14 @@
     -fx-background-color: transparent;
     -fx-border-color: transparent;
 }
+
+/* ============ 选择日期弹窗卡片风格 ============ */
+.date-range-panel {
+    -fx-background-color: F5F5F5;                                    /* 白底 */
+    -fx-background-radius: 8;                                       /* 圆角 */
+    -fx-padding: 16;                                                /* 四边统一内边距 */
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 0);  /* 阴影 */
+}
+
+/* 如果你还想调整里面按钮的样式，可以复用 .button.date-button */
+
