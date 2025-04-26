@@ -56,8 +56,10 @@ You can download the latest version of Apple Clock below ⬇️
 ---
 
 ## 📸 Screenshots
+<img width="403" alt="image" src="https://github.com/user-attachments/assets/7b8481ad-ce88-4441-8859-bd65b33b4bad" />
+<img width="698" alt="image" src="https://github.com/user-attachments/assets/84042578-6a1b-451e-932b-e724e2016a78" />
+<img width="695" alt="image" src="https://github.com/user-attachments/assets/6687dd0d-da9d-4726-8274-00865c465517" />
 
-*Coming soon…*
 
 ---
 
