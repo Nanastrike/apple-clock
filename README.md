@@ -35,11 +35,10 @@ It's my personal tool to:
 
 You can download the latest version of Apple Clock below ⬇️
 
-### ✅ Windows (Installer)
-[👉 Download AppleClock.exe](https://github.com/YOUR_USERNAME/AppleClock/releases/latest)
+
 
 ### 🍎 Mac (App or DMG)
-[👉 Download AppleClock.dmg](https://github.com/YOUR_USERNAME/AppleClock/releases/latest)
+[👉 Download AppleClock.dmg](https://github.com/Nanastrike/apple-clock/releases/tag/apple-clock)
 
 > No need to install Java – it's bundled inside.  
 > Just download and double-click to run.
@@ -57,8 +56,10 @@ You can download the latest version of Apple Clock below ⬇️
 ---
 
 ## 📸 Screenshots
+<img width="403" alt="image" src="https://github.com/user-attachments/assets/7b8481ad-ce88-4441-8859-bd65b33b4bad" />
+<img width="698" alt="image" src="https://github.com/user-attachments/assets/84042578-6a1b-451e-932b-e724e2016a78" />
+<img width="695" alt="image" src="https://github.com/user-attachments/assets/6687dd0d-da9d-4726-8274-00865c465517" />
 
-*Coming soon…*
 
 ---
 
